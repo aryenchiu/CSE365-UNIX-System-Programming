@@ -1,0 +1,122 @@
+In the next few programming assignments, we'll implement a text adventure game.
+It's interesting to compare text adventure games to UNIX's directory structure.
+In text games you walk between rooms containing objects you can examine & move;
+in UNIX you change between directories containing files you can examine & move.
+These games also have locked doors that you cannot get through without a key or
+combination; UNIX directories can also have permissions set to deny you access.
+Some objects can be hidden, and so can some UNIX files. So we can learn UNIX
+while having fun writing a game.
+
+The specific text adventure game that we will be recreating is one level of
+a game called Dunnet. The main reason that I've chosen this specific game is
+that you already have it in your UNIX system, because it comes with the emacs
+text editor. (Yes, I know that that is weird, why should a text editor have a
+game built into it?) Emacs is a good option for creating text files in UNIX.
+Many programmers use it. It takes a few minutes to memorize the key codes for
+simple commands. Many of these key codes also work on the UNIX command prompt,
+so it makes sense to learn them anyway (see the last few slides of lecture #1).
+
+To play the game, first verify that you have installed the emacs text editor.
+You don't want to install it to play this game -- you want it because it is
+a good word processor to use for UNIX programming. (But it also, inexplicably,
+does contain this game.) To verify that you have emacs, type (ignore the %):
+    % emacs
+
+If it doesn't run, then install it.  Once emacs is running, close it by typing
+Ctrl-x, Ctrl-c. I only had you open it to test if it was installed -- the
+dunnet game is going to be run from the UNIX command prompt, not from within
+the emacs screen. (You run it by typing: "emacs -batch -l dunnet".)
+
+We will now begin discussing the current programming assignment. In this first
+assignment, you will create the directories and files that map to part of the
+Dunnet game. (In the next homework we will use aliases to create some of the
+game's commands.) Once you've created the correct directory and file structure,
+then you will create a tarfile to submit it as homework #1.
+
+If you are reading this file, then you must have: 1) successfully untarred the
+PA1.tar file, 2) gone into the PA1 directory that was made when you untarred,
+and 3) displayed this README file. So let's take a look at that directory:
+    % cd ~/PA1assignment
+    % ls
+    PA1assignment.txt  expectedOutput              gradingPolicy.txt
+    README             explanatorywalkthrough.txt  objects
+    descriptions       findYourOutput.exe          savedgame
+    %
+
+The explanatoryWalkthrough.txt file explains how to play the dunnet game,
+particularly the part that we will be implementing in this homework. Read this
+walkthrough file next, after you finish reading this README file.
+
+The savedgame file is used by the dunnet game, in order to load up the part
+of the game that we'll be implementing. The explanatoryWalkthrough.txt file
+describes how to use this savedgame file.
+
+The PA1assignment.txt file describes the details of this first homework. You
+will want to read that file after you finish reading the walkthrough.
+
+The descriptions and objects directories contain the text that you will be
+placing into various files that you need to create in this first homework.
+How you are to do this is discussed in the PA1assignment.txt file, but the
+point here is that the files are given to you; you can just copy them over
+to the place they are meant to go.
+
+The gradingPolicy.txt file explains the strict rules that will be employed
+in grading the homework. Most important is to know the stiff penalties for
+cheating. The course name is "UNIX System Programming"; therefore, it has the
+word "programming" in the title. This means that programming is a crucial part
+of the course. Your assignments will, in fact be worth 42% of your final grade.
+It is therefore a very serious matter to cheat on the homework. So don't cheat.
+Also, read the grading policy and know what is allowed and disallowed.
+
+The gradingPolicy.txt file also describes the strict rules involving partial
+credit. Each assignment will have a basic standard of performance. If your
+submitted file does not match the basic standard, then it will receive a 0.
+This strict rule is necessary to allow the grading to be able to be completed
+in reasonable time (and to leave the grader enough time to look for cheating).
+The gradingPolicy.txt file explains how to use the findYourOutput.exe file to
+see if you match the basic standard.
+
+The findYourOutput.exe file is not meant for you to read. It is used to create
+a listing of your output, which can be compared to the expectedOutput file.
+
+The expectedOutput file is the basic standard of performance that is expected
+for the first homework. The PA1assignment.txt file will explain how you can
+check your answer against the expected output. If you view this file, you will
+see that it lists every file and directory that you will create.
+
+This expectedOutput listing has a feature that the contents of each individual
+directory appear together. What do I mean? Well, after reading the walkthrough,
+you will understand that one of the rooms is the "Museum lobby" which has in it
+a dinosaur skeleton and an exit to the south (among other things). That means
+that this directory contains files with the names "dinosaur" and "skeleton",
+and it also contains a subdirectory named "s". Once you finish creating the
+homework #1 files, you will be able to go to that directory and do this:
+   % cd rooms/n/n/u/w/s/w/w
+   % ls -d dinosaur skeleton s
+   dinosaur  s  skeleton
+   %
+As we see above, ls lists alphabetically, so the "s" subdirectory lists between
+the two files (if we use the -d flag). Well, the find command is alphabetical,
+so we get:
+   % find . -name "*"
+   ...
+   ./dinosaur
+   ./s
+   ./s/descriptionL
+   ./s/se
+   ...
+   ./s/se/s/mail
+   ./skeleton
+   %   
+What we see above is that all of the files inside the subdirectories get listed
+after the "dinosaur" file, but before the "skeleton" file. And that is what the
+expectedOutput file fixes. The dinosaur and skeleton files get listed together.
+By listing them together, it makes it easier for you to see which files you need
+to put into the different rooms.
+
+
+OK. So now we have described all of the provided files.
+
+The next step is for you to proceed on to reading the explanatoryWalkthrough.txt
+file, then the PA1assignment.txt file, then the gradingPolicy.txt file.
+

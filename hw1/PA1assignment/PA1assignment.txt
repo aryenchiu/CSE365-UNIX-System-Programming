@@ -1,0 +1,365 @@
+                          UNIX System Programming
+                         Programming Assignment #1
+
+Due: Tuesday, March 1  at  11:59 pm.
+
+Submission rules: Submit to the cyberuniversity exactly one tar file, named:
+                  "<your student ID>.tar"
+                  You will, of course, replace "<your student ID>" with
+                  your unique ID number (B9.... or M9....)
+
+                  The end of Lecture 1 describes how to upload your homework.
+                  These lecture slides cannot be understood from a printout:
+                  they must be played to watch the animation that explains the
+                  upload process. See gradingPolicy.txt for more details.
+                  
+Getting help:   - The Professor has office hours on Monday from 12:00-2:00,
+                  and on Friday from 10:00-12:00, in room 9037. You can also 
+                  reach me by email. My preferred email is stevewhaga@yahoo.com
+                - General questions about the assignment can also be posted to 
+                  the Discussion Forum of the class's cyberuniversity page.
+                - You may also discuss the ideas of the assignment with your
+                  classmates. But you CANNOT share code. See gradingPolicy.txt
+                  file for more details.
+
+How to read this file:
+
+Before you read this, you should read the README and explanatoryWalkthrough.txt
+files. Also review the slides for Lecture 1, because those commands are used in
+the text below.
+
+You should read this file twice. Once before you implement it, and a second
+time, while you are implementing it. After reading this file, next read the
+gradingPolicy.txt file. Read that file before implementing the assignment,
+because it defines what is considered cheating.
+
+Assignment Summary:
+
+In the first week, you learned about creating directories, files, hidden files,
+and links. You learned about navigating directory structures. In order to 
+reinforce the learning of these concepts, you will create a directory structure
+that you will use in later weeks to implement the dunnet game. There is some
+similarity between the idea of placing files in a directory and the idea of
+placing objects in a room of a text-based adventure game.
+
+Let us take a look at what is in the description file you were provided: 
+   % cd descriptions/
+   % ls
+   descriptionA  descriptionG  descriptionM  descriptionS  descriptionY
+   descriptionB  descriptionH  descriptionN  descriptionT  descriptionZ
+   descriptionC  descriptionI  descriptionO  descriptionU
+   descriptionD  descriptionJ  descriptionP  descriptionV
+   descriptionE  descriptionK  descriptionQ  descriptionW
+   descriptionF  descriptionL  descriptionR  descriptionX
+   % cat descriptionA
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   % cat descriptionB
+   N/S tunnel
+   You are in a north/south tunnel.
+   %
+
+Here we see that there are 26 files, and they correspond to the 26 rooms in the
+game. We also see that the file names make it very clear as to which description
+file matches to which room.
+
+Lets also look at the objects directory:
+   % cd ../objects
+   % ls
+   acid        board     chip      disposal  gate       license  silver    trees
+   amethyst    bone      coconut   drop      glycerine  mail     skeleton  vax
+   bear        boulder   coconuts  emerald   ibm        nitric   switch
+   bin         bracelet  computer  fish      jar        palm     tank
+   bins        cabinet   cpu       food      key        ruby     tanks
+   blackboard  card      dinosaur  garbage   lamp       shovel   tree
+   % cat amethyst
+   I see nothing special about that.
+   % cat tree
+   They are palm trees with a bountiful supply of coconuts in them.
+   % cat bins
+   All of the bins are empty.  Looking closely you can see that there
+   are names written at the bottom of each bin, but most of them are
+   faded away so that you cannot read them.  You can only make out three
+   names:
+                      Jeffrey Collier
+                      Robert Toukmond
+                      Thomas Stock
+   % cat fish
+   The fish look like they were once quite beautiful.
+   %
+
+Here we see that the files for the objects of the game also are provided. (But
+note that some files which are not objects, such as the files that will be used
+to create the locked rooms. These still need to be made by you. And they must
+be in UNIX format.)
+
+Now that we see what we've been given, let's start implementing the homework.
+The first step is to create the rooms (ie, the directory structure). From your
+home directory, create a subdirectory called "PA1". Then cd to PA1. Now create
+a subdirectory inside of "PA1", called "rooms". Then cd into rooms. Inside of
+this new subdirectory, you will be creating the rooms of the game. In fact,
+this "rooms" directory is the first room (the museum subway station). You will
+recall, from reading the walkthrough, that this first room was identified as
+room A, and that there is a room to the north of it. So you should copy the
+description for room A into here, and create a subdirectory named "n". When
+you have done so, you should be able to do the following:
+   % ls
+   descriptionA  n
+   % cd n
+   %
+
+Now we are in room B, which also has a room to its north. So you do the same
+procedure, and then you should have this:
+   % ls
+   descriptionB  n
+   % cd n
+   %
+
+At this point we are in room C. But this room has an object. And that object
+has two possible names. So those files also need to be copied over from the
+objects directory. When you have done so, you should have:
+   % ls
+   d  descriptionC  disposal  garbage  u
+   % cat garbage
+   I see nothing special about that.
+   % cd u
+   %
+
+And proceeding on like this, let's suppose that you have made all of the rooms.
+Then you could proceed like so:
+   % ls
+   descriptionF  w
+   % cd w
+   % ls
+   blackboard  descriptionG  e  glycerine  s  w
+   % cat blackboard
+   I see nothing special about that.
+   % cd e
+   -bash: cd: e: Not a directory
+   % cat e
+   The door is locked.
+   % cat w
+   cat: w: Is a directory
+   % cd w
+   %
+
+From the above, we see how the locked door is handled. Let's look at the room we
+are in now:
+   % ls
+   descriptionJ  fish  jar  ruby  s  tank  tanks
+   % ls -l s
+   lrwxrwxrwx 1 Me None 6 Feb  2 20:25 s -> ../s/w
+   % cd s
+   % ls
+   descriptionI  n  w
+   % ls -l n
+   lrwxrwxrwx 1 Me None 7 Feb  2 20:24 n -> ../../w
+   %
+
+Here we see how to create the loop between rooms G-H-I-J.
+OK. So now, supposing that you've done everything, you
+could do this:
+   % cd ~/PA1/rooms
+   % find . -name "*"
+   .
+   ./descriptionA
+   ./n
+   ./n/descriptionB
+   ./n/n
+   ./n/n/d
+   ./n/n/d/amethyst
+   ./n/n/d/descriptionD
+   ./n/n/d/ne
+   ...
+   %
+
+You will recall that the README file had explained that the problem with the
+above use of find is that subdirectories can breakup the displaying of files
+from the from the same room. (In the README file, the specific example of the
+distance between the dinosaur and skeleton files was discussed.) To address
+this problem, the findYourOutput.exe file has been provided. Let's run it:
+   % ls
+   PA1assignment.txt  expectedOutput              gradingPolicy.txt
+   README             explanatorywalkthrough.txt  objects
+   descriptions       findYourOutput.exe          savedgame
+   %
+   % ~/PA1assignment/findYourOutput.exe
+   % ls
+   PA1assignment.txt  expectedOutput              gradingPolicy.txt  yourOutput
+   README             explanatorywalkthrough.txt  objects
+   descriptions       findYourOutput.exe          savedgame
+   %
+   % diff expectedOutput yourOutput
+   %
+
+As we can see above, I have given you 9 files or directories. But, after running
+findYourOutput.exe, a new file was created, "yourOutput". I then used diff to
+compare it to the "expectedOutput" file, and there were no differences displayed.
+These means that I have created to correct files and directories. If you get
+differences, then you have errors. (But even if there are no differences, it does
+not mean that the contents of those files are necessarilyl correct.)
+
+Let's look at part of that output, to see that the dinosaur and skeleton files
+are now next to each other:
+   % head -40 yourOutput
+   .
+   ./descriptionA
+   ./yourOutput
+   ./n
+   ./n/descriptionB
+   ./n/n
+   ./n/n/descriptionC
+   ./n/n/disposal
+   ./n/n/garbage
+   ./n/n/d
+   ./n/n/d/amethyst
+   ./n/n/d/descriptionD
+   ./n/n/d/ne
+   ./n/n/d/ne/cabinet
+   ./n/n/d/ne/computer
+   ./n/n/d/ne/descriptionE
+   ./n/n/d/ne/ibm
+   ./n/n/d/ne/vax
+   ./n/n/u
+   ./n/n/u/descriptionF
+   ./n/n/u/w
+   ./n/n/u/w/blackboard
+   ./n/n/u/w/descriptionG
+   ./n/n/u/w/e
+   ./n/n/u/w/glycerine
+   ./n/n/u/w/s
+   ./n/n/u/w/s/acid
+   ./n/n/u/w/s/descriptionH
+   ./n/n/u/w/s/switch
+   ./n/n/u/w/s/nitric
+   ./n/n/u/w/s/w
+   ./n/n/u/w/s/w/descriptionI
+   ./n/n/u/w/s/w/n
+   ./n/n/u/w/s/w/w
+   ./n/n/u/w/s/w/w/bone
+   ./n/n/u/w/s/w/w/descriptionK
+   ./n/n/u/w/s/w/w/dinosaur
+   ./n/n/u/w/s/w/w/skeleton
+   ./n/n/u/w/s/w/w/s
+   ./n/n/u/w/s/w/w/s/descriptionL
+   %
+
+The last few lines, above, show the dinosaur and the skeleton.
+
+So, as we see in the above, the dinosaur and skeleton are displayed together.
+If you have done you assignment correctly, you should get the same output as
+shown above. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+By the way, here are some tips you might find helpful in doing your homework:
+
+1. Use the up-arrow key to scroll through old commands. For example, making the
+   first few rooms does not require many key strokes:
+       % cd rooms
+       % mkdir n
+       % mkdir n/n   <- I just did the Up-arrow and added a "/n".
+       % mkdir n/n/d <- I just did the Up-arrow and added a "/d".
+       % mkdir n/n/u <- I just did the Up-arrow and turned the "d" into a "u".
+       
+   You can also hit the Up-arrow several times to modify and run an older command.
+
+
+2. It is helpful to memorize the hot keys to modify a command line:
+     Ctrl-a: Takes you to the beginnig of the line. Suppose you had just made
+             a directory like this:
+                 % mkdir rooms/n/n/u
+
+             If you wanted to then cd into that directory, you can use the
+             up-arrow, then a ctrl-a to get to the beginning of the line,
+             then hit the delete key 5 times, then type "cd". At that point,
+             you'll have:
+                 % cd rooms/n/n/u
+
+     Ctrl-e: Takes you to the end of the line.
+
+     Ctrl-c: Erases the command you are typing. (ie, start over.)
+     
+     Ctrl-k: Cuts out everything to the right of the cursor. Not only is this
+             faster than holding down the delete key, it also saves the text
+             that you've cut into a buffer (so that you can paste it later).
+
+     Ctrl-y: Pastes in the buffer of cut text.
+                 
+     Tab:    This completes the rest of a filename or command. For example,
+             if you want to view the gradingPolicy.txt file, you type:
+                 % less ~/PA1assignment/g    <== At this point, hit tab
+             If you hit tab, it will auto-fill-in the rest:
+                 % less ~/PA1assignment/gradingPolicy.txt
+
+     Ctrl-c, Ctrl-d, Closing the window with your mouse: Try these things if 
+             your computer gets stuck in some command. (The computer isn't 
+             stuck, but you may not know what you are doing. For example, maybe
+             you can't remember that you exit a "less" command by hitting "q".)
+
+
+3. There are some files that you need to create yourself. These can be created
+   by use Notepad in Windows, but then the files will be in DOS format, and you
+   will need to use d2u to fix them. A better alternative is to use an editor
+   in UNIX to make these files. Your best choices are nano and emacs. I use
+   emacs. ONe nice feature of emacs is that the hot keys described above also
+   work in emacs. When you want to save in emacs, type "ctrl-x" then "ctrl-s".
+   When you want exit emacs, type "ctrl-x" then "ctrl-c". If you get stuck in
+   emacs because you used the wrong hot keys, hit "ctrl-g" several times to
+   back to regular text editing.
+
+
+4. If you use emacs, then it will create a backup file that has a "~" at the
+   end (eg "nw~"). These need to be removed in order for "findYourOutput.exe"
+   to not list them in the "yourOutput" file it creates.
+   Well you can remove those files by typing:
+       % cd rooms
+       % rm *~      <==Here, we must be VERY careful NOT to type: rm * ~
+       % rm */*~    <==Up-arrow, Left-arrow, type "/*". Again, be careful
+       % rm */*/*~  <==Up-arrow, Left-arrow, type "/*". Again, be careful
+       ... until you go enough levels to remove all of the *~ files.
+
+   Remember Spiderman's uncle: "with great power comes great responsibility."
+   typing "rm * ~" instead of "rm *~" is very, very wrong.
+
+
+5. If you get confused about the directories, they can be renamed and moved
+   around. For example, maybe you made a directory path:
+       % mkdir rooms/n/n/d/nw
+   But then you realized that it's not "nw" but "ne". Well you just rename it:
+       % mv rooms/n/n/d/nw room/n/n/d/ne
+       
+   Directories can also be moved around:
+       % mkdir rooms/n/n/ne  <== Oops. I forgot the "d"
+       % mkdir rooms/n/n/d
+       % mv rooms/n/n/ne rooms/n/n/d    <== fixed now.
+       
+
+6. If you make a bad link, it has to be removed before you can make a new one
+   with the same name.
+
+
+7. Remember that "cd -" takes you back to the previous directory you were in.
+
+
+8. Practice safe computing (always, but especial in UNIX). This means that you
+   should tar up your partial solutions from time to time, and save the tar
+   file somewhere safer, such as in a Windows computer. (I do not meant that
+   UNIX is not safe, I mean that it is not safe for you, because you are a new
+   student, and might accidentally type rm *.)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Now that you are finishing reading this file, read the gradingPolicy.txt file.
+
+Then do the assignment.
+
+When you are done, make a tarfile of the HW1 directory (which contains "rooms"
+as a subdirectory). Follow the tar file's naming rules described at the top of
+this PA1assignment.txt file.
+
+Before submitting, re-read the gradingPolicy.txt file. It describes how to test
+whether your submission meets the minimum standard to receive a non-zero grade.
+If you do not have time or do not know how to make the links, description, or
+object files, you should at least create empty files with those names. This
+will let you at least meet the minimum standard.

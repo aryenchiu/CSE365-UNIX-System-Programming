@@ -1,0 +1,468 @@
+Let's play some of the actual game, to remember how rooms display and how the
+get command works:   
+   % emacs -batch -l dunnet
+   
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a shovel here.
+   >get shovel
+   Taken.
+   >e
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a large boulder here.
+   >e
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   >dig
+   I think you found something.
+   >l
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   There is a CPU card here.
+   >
+
+The above walkthrough shows the playing of the real game, not our version of
+it. That's why, for example, I was able to use the dig command -- our version
+of the game doesn't have this command (but our version does have the CPU card
+as one of its objects, because we may later wish to add in the dig command).
+
+Anyway, now that the CPU card is exposed, let's keep playing:
+   >se
+   SE/NW road
+   You are on a southeast/northwest road.
+   There is some food here.
+   >se
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   There is a ferocious bear here!
+   >sw
+   Hidden area
+   There is an emerald bracelet here.
+   >x bracelet
+   I see nothing special about that.
+   >get bracelet
+   Taken.
+   >i
+   You currently have:
+   A lamp
+   A bracelet
+   >x emerald
+   I see nothing special about that.
+   >
+
+From the above, we see that the "emerald bracelet" changes its name to just
+"bracelet" when it is in the inventory. Despite the fact that the "emerald"
+adjective no longer displays in the inventory, you can still use that word as
+a synonym for the argument to the "x" command.
+
+In our version, we will only use one name to display a given object, whether
+it be in the room or the inventory. And the name we choose to display is the
+name of the noun. Thus, the name we use for "emerald bracelet" is "bracelet",
+and the name for "nitric acid" is "acid". (To restate the obvious: we still
+allow any of the synonyms to be used for getting, examining, or dropping the
+object -- the discussion about the noun is just about how it displays when it
+is in either your inventory or in the room's description.)
+
+Moving on:
+   >ne
+   Bear hangout
+   There is a ferocious bear here!
+   >drop shovel
+   Done.
+   >nw
+   SE/NW road
+   There is some food here.
+   >get food
+   Taken.
+   >
+
+From the above, we see that the food is one of the items that displays each
+time you enter the room. And we see that the food is a getable object. It is
+in fact the case that every getable object is also an object that you display
+each time you enter the room.
+
+But if we move on, we will see that there are also some objects that display
+each time, even though they aren't getable:
+   >se
+   Bear hangout
+   There is a ferocious bear here!
+   There is a shovel here.
+   >get shovel
+   Taken.
+   >get bear
+   You cannot take that.
+   >
+
+From the above, we see that the bear displays every time. Let's find another
+such object:
+   >nw
+   SE/NW road
+   >nw
+   Fork
+   There is a CPU card here.
+   >w
+   E/W Dirt road
+   There is a large boulder here.
+   >get boulder
+   You cannot take that.
+   >
+
+From the above, we see that the boulder, like the bear, is ungetable but also
+displays each time you enter the room. In fact, these two ungetable objects
+are the only ones with this behavior (among the objects in the portion of the
+game that our version implements).
+
+Let's look at how our inventory displays:
+   >i
+   You currently have:
+   A lamp
+   A bracelet
+   Some food
+   A shovel
+   >
+
+From the above, see that the inventory displays differently than our version.
+(We would have said: "You currently have: bracelet, food, lamp, shovel.")
+
+Let's empty our inventory:
+   >drop lamp
+   Done.
+   >drop bracelet
+   Done.
+   >drop food
+   Done.
+   >drop shovel
+   Done.
+   >i
+   You currently have:
+   >
+
+From the above, see that the inventory displays differently than our version.
+(We would have said: "You currently have: .")
+
+Anyway, let's move on:
+   >e
+   Fork
+   There is a CPU card here.
+   >get card
+   Taken.
+   >i
+   You currently have:
+   A computer board
+   >x chip
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >x computer
+   I don't see that here.
+   >
+
+From the above, see that the "CPU card" changes its name to "computer board"
+when in the inventory. But "chip" is also a synonym (and "computer" isn't).
+
+Now, if you will recall what we have discussed a few moments ago, we earlier
+stated that "the name we choose to display is the name of the noun." But this
+new object presents a problem for this rule, because the object displays as
+"CPU card" in the room, but "computer board" in the inventory -- so "board"
+and "card" are both nouns. WE WILL USE: "board".
+
+Moving on:
+   >w
+   E/W Dirt road
+   There is a large boulder here.
+   There is a lamp nearby.
+   There is an emerald bracelet here.
+   There is some food here.
+   There is a shovel here.
+   >
+
+From the above we see how various objects display. Our new PA3 version of
+"hereitems" will display similarly. Imagine, for a moment, that we had been
+playing our version of the game and had put these same objects in this same
+room. Then we could get the following behavior:
+         % sh
+         % source ./PA3.sh
+         Museum station
+         You are at the Museum subway stop.  A passage leads off to the north.
+         >cd ~/D/rooms/n/n/u/w/s/w/w/s/se/s/e/s/s/sw/sw/w
+         >touch bracelet food lamp shovel
+         >ls
+         boulder   coconut   descriptionV  lamp  shovel  trees
+         bracelet  coconuts  food          palm  tree    w
+         >hereitems
+         There is a boulder here.
+         There is a bracelet here.
+         There is a food here.
+         There is a lamp here.
+         There is a shovel here.
+         >
+
+Comparing our "hereitems" output in the last paragraph to the way the real
+game displays the objects in the 2nd-to-last paragraph, we see that they are
+very similar. The only differences are: 1) we only display the noun, 2) we
+say "a food" not "some food", and 3) we say "lamp here" not "lamp nearby".
+Beyond these small differences, there appears to be one more regarding "a"
+versus "an": we say "a bracelet" not "an emerald". This one is not a real
+difference, however, because you will find, in implementing the new version
+of "hereitems", that we do in fact say "an acid" and "an amethyst".
+
+Well, let's get back to playing the real game. So far, we have only used the
+get command on individual objects (eg, "get shovel" or "get food"). Let's now
+see how the game lets us pick up multiple things at once:
+   >get all
+   A lamp: Taken.
+   A bracelet: Taken.
+   Some food: Taken.
+   A shovel: Taken.
+   >get all
+   Nothing to take.
+   >l
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a boulder here.
+   >get boulder
+   You cannot take that.
+   >get palm
+   You cannot take that.
+   >get coconuts
+   You cannot take that.
+   >get bear
+   I do not see that here.
+   >
+
+From the above we see how "get all" works. It picks up all of the getable
+objects, and displays a message for each. It does not pick up other objects
+that are present, like the palm or the coconuts -- or even the boulder, which
+is an object that displays every time.
+
+Our version of "get all" works the same, except that it prints differently
+when listing the objects that are gotten:
+         % source ./PA3.sh
+         Museum station
+         You are at the Museum subway stop.  A passage leads off to the north.
+         >i
+         You currently have: lamp.
+         >cd ~/D/inv; ls
+         lamp
+         >rm lamp; touch cpu chip card board; ls
+         board  card  chip  cpu
+         >i
+         You currently have: board.
+         >cd ~/D/rooms/n/n/u/w/s/w/w/s/se/s/e/s/s/sw/sw/w
+         >touch bracelet food lamp shovel
+         >ls
+         boulder   coconut   descriptionV  lamp  shovel  trees
+         bracelet  coconuts  food          palm  tree    w
+         >get all
+         Taken: bracelet food lamp shovel
+         >get all
+         Nothing to take.
+         >get boulder
+         You cannot take that.
+         >get palm
+         You cannot take that.
+         >get coconuts
+         You cannot take that.
+         >get bear
+         I do not see that here.
+         >i
+         You currently have: board, bracelet, food, lamp, shovel.
+         >
+
+Look again at the above output of our "i" command. Although it looks fine, it
+should be noted that it differs from how the real game would display it:
+   >i
+   You currently have:
+   A lamp
+   Some food
+   A bracelet
+   A shovel
+   A computer board
+   >
+
+Now we are done discussing the real game. But, to end out this current file,
+you might like to see the full expected output of our version, if the above
+commands for the real game were all executed. So the rest of this file will
+show you our game's behavior, without comment.
+
+But before ending the comments, I'll say six things:
+ 1. After the code below runs PA3.sh, it first executes a few commands whose
+    purpose are to set things up for starting the game in the place where the
+    shovel is. This is done in order to match the starting conditions we used
+    above, in our demonstration of how the real game behaves.
+ 2. In order to then run all the commands that the above walkthrough has run,
+    the code below then does a "source ./demoHowOurGameHandlesTheseCommands".
+    The result is that these commands are then executed. 
+ 3. You should work to understand how the "theCommandsUsedInThisWalkthrough"
+    and "demoHowOurGameHandlesTheseCommands" files are created below, as it
+    will help you to understand the techniques you will need to use in order
+    to implement "hereitems". (But "hereitems" doesn't use "paste".)
+ 4. The "demoHowOurGameHandlesTheseCommands" file first does an echo of each
+    command before running it, so that you'll see the commands that are being
+    simulated as having been typed by the user.
+ 5. The output below shows the key and computer board as already visible,
+    because our version of the game doesn't implement "dig" or "feed bear".
+ 6. This also why there is a "grep -v dig" in the code below that creates the
+    "theCommandsUsedInThisWalkthrough" file from the above walkthrough.
+
+That's the end of the comments. Here now is our game's expected behavior:
+
+% cat walkthroughComparisonToRealGame.txt | d2u | grep "^   >." | grep -o '[a-z].*'| grep -v dig >theCommandsUsedInThisWalkthrough
+%
+% cat theCommandsUsedInThisWalkthrough |grep -n ^|tr : \>|grep -n ^|tr : \\\\ |grep -n ^|tr : \ |grep -n ^|tr : o|grep -n ^|tr : h|grep -n ^|tr : c|grep -n ^|tr : e|tr -d "0-9" | paste - theCommandsUsedInThisWalkthrough | tr "\t" \; > ~/demoHowOurGameHandlesTheseCommands
+%
+% head -2 ~/demoHowOurGameHandlesTheseCommands
+echo \>get shovel;get shovel
+echo \>e;e
+%
+% bash
+% source ./PA3.sh
+Museum station
+You are at the Museum subway stop.  A passage leads off to the north.
+>cd ~/D/rooms/n/n/u/w/s/w/w/s/se/s/e/s/s/sw/sw/w/w
+>touch .v
+>cd ~/D/objs
+>
+>
+>l
+Dead end
+You are at a dead end of a dirt road.  The road goes to the east.
+In the distance you can see that it will eventually fork off.  The
+trees here are very tall royal palms, and they are spaced equidistant
+from each other.
+There is a shovel here.
+>
+>
+>echo "After I type the following source command, I won't type anything">~/X
+>echo "else, because the rest of the output will automatically generate">~/X
+>echo "from the demoHowOurGameHandlesTheseCommands file.               ">~/X
+>source ~/demoHowOurGameHandlesTheseCommands
+>get shovel
+Taken.
+>e
+E/W Dirt road
+You are on the continuation of a dirt road.  There are more trees on
+both sides of you.  The road continues to the east and west.
+There is a boulder here.
+>e
+Fork
+You are at a fork of two passages, one to the northeast, and one to the
+southeast.  The ground here seems very soft. You can also go back west.
+There is a board here.
+>l
+Fork
+You are at a fork of two passages, one to the northeast, and one to the
+southeast.  The ground here seems very soft. You can also go back west.
+There is a board here.
+>se
+SE/NW road
+You are on a southeast/northwest road.
+There is a food here.
+>se
+Bear hangout
+You are standing at the end of a road.  A passage leads back to the
+northwest.
+There is a bear here.
+There is a key here.
+>sw
+Hidden area
+You are in a well-hidden area off to the side of a road.  Back to the
+northeast through the brush you can see the bear hangout.
+There is a bracelet here.
+>x bracelet
+I see nothing special about that.
+>get bracelet
+Taken.
+>i
+You currently have: bracelet, lamp, shovel.
+>x emerald
+I see nothing special about that.
+>ne
+Bear hangout
+There is a bear here.
+There is a key here.
+>drop shovel
+Dropped.
+>nw
+SE/NW road
+There is a food here.
+>get food
+Taken.
+>se
+Bear hangout
+There is a bear here.
+There is a key here.
+There is a shovel here.
+>get shovel
+Taken.
+>get bear
+You cannot take that.
+>nw
+SE/NW road
+>nw
+Fork
+There is a board here.
+>w
+E/W Dirt road
+There is a boulder here.
+>get boulder
+You cannot take that.
+>i
+You currently have: bracelet, food, lamp, shovel.
+>drop lamp
+Dropped.
+>drop bracelet
+Dropped.
+>drop food
+Dropped.
+>drop shovel
+Dropped.
+>i
+You currently have: .
+>e
+Fork
+There is a board here.
+>get card
+Taken.
+>i
+You currently have: board.
+>x chip
+The CPU board has a VAX chip on it.  It seems to have
+2 Megabytes of RAM onboard.
+>x computer
+I do not see that here.
+>w
+E/W Dirt road
+There is a boulder here.
+There is a bracelet here.
+There is a food here.
+There is a lamp here.
+There is a shovel here.
+>get all
+Taken: bracelet food lamp shovel
+>get all
+Nothing to take.
+>l
+E/W Dirt road
+You are on the continuation of a dirt road.  There are more trees on
+both sides of you.  The road continues to the east and west.
+There is a boulder here.
+>get boulder
+You cannot take that.
+>get palm
+You cannot take that.
+>get coconuts
+You cannot take that.
+>get bear
+I do not see that here.
+>i
+You currently have: board, bracelet, food, lamp, shovel.
+>

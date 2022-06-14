@@ -1,0 +1,453 @@
+Below is the expected output for new programming assignment. I will post a
+README file later, but you can get started thinking about the assignment by
+reading this walkthrough:
+   % bash
+   % source ./PA3.sh 
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   >i
+   You currently have: lamp.
+   >x lamp
+   The lamp is hand-crafted by Geppetto.
+   >
+
+The above output is just like in the previous programming assignment. But this
+new assignment now has a drop command also:
+   >drop lamp
+   Dropped.
+   >i
+   You currently have: .
+   >l
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   There is a lamp here.
+   >x lamp
+   The lamp is hand-crafted by Geppetto.
+   >
+
+The new assignment also implements get:
+   >get lamp
+   Taken.
+   >get lamp
+   I do not see that here.
+   >l
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   >i
+   You currently have: lamp.
+   >
+
+Moving on, let's see some of the different behaviors for the get command:
+   >n
+   N/S tunnel
+   You are in a north/south tunnel.
+   >n
+   North end of N/S tunnel
+   You are at the north end of a north/south tunnel.  Stairs lead up and
+   down from here.  There is a garbage disposal here.
+   >get garbage
+   You cannot take that.
+   >x garbage
+   I see nothing special about that.
+   >get disposal
+   You cannot take that.
+   >x disposal
+   I see nothing special about that.
+   >get all
+   Nothing to take.
+   >get amethyst
+   I do not see that here.
+   >d
+   Bottom of subway stairs
+   You are at the bottom of some stairs near the subway station.  There is
+   a room to the northeast.
+   There is an amethyst here.
+   >get all
+   Taken: amethyst
+   >i
+   You currently have: amethyst, lamp.
+   >
+
+From the above, we see that we will implement "get all", just like in the real
+game. The above also shows some different outputs under different scenarios:
+"You cannot take that.", "I see nothing special about that.", "Nothing to 
+take.", "I do not see that here.", and "Taken: amethyst". You should take the
+time to understand why each of the messages were displayed. Moving on:
+   >u
+   North end of N/S tunnel
+   >u
+   Top of subway stairs
+   You are at the top of some stairs near the subway station.  There is
+   a door to the west.
+   >w
+   Classroom
+   You are in a classroom where school children were taught about natural
+   history.  On the blackboard is written, ‘No children allowed downstairs.’
+   There is a door to the east with an ‘exit’ sign on it.  There is another
+   door to the west.
+   There is a glycerine here.
+   >s
+   Maintenance room
+   You are in some sort of maintenance room for the museum.  There is a
+   switch on the wall labeled ‘BL’.  There are doors to the west and north.
+   There is an acid here.
+   w>w
+   Geological display
+   You are in the geological display.  All of the objects that used to
+   be on display are missing.  There are rooms to the east, west, and
+   north.
+   >n
+   Marine life area
+   You are in the marine life area.  The room is filled with fish tanks,
+   which are filled with dead fish that have apparently died due to
+   starvation.  Doors lead out to the south and east.
+   There is a jar here.
+   There is a ruby here.
+   >e
+   Classroom
+   There is a glycerine here.
+   >
+
+In the above, we went through the 4-room cycle in the museum, so that we can
+now go back through the rooms and only see the short descriptions: 
+   >s
+   Maintenance room
+   There is an acid here.
+   >w
+   Geological display
+   >n
+   Marine life area
+   There is a jar here.
+   There is a ruby here.
+   >e
+   Classroom
+   There is a glycerine here.
+   >
+
+The above descrpitions shows that there are a number of objects to get. So now
+we'll do that:
+   >get all
+   Taken: glycerine
+   >s
+   Maintenance room
+   There is an acid here.
+   >get all
+   Taken: acid
+   >w
+   Geological display
+   >i
+   You currently have: acid, amethyst, glycerine, lamp.
+   >x acid
+   I see nothing special about that.
+   >x nitric
+   I see nothing special about that.
+   >
+
+From the above, we see that the nitric acid always displays as "acid", but the
+synonym of "nitric" still works for the user to type. In a similar way, the
+emerald bracelet always displays as "bracelet" and the computer board always
+displays as "board".  Moving on:
+   >n
+   Marine life area
+   There is a jar here.
+   There is a ruby here.
+   >get all
+   Taken: jar ruby
+   >get fish
+   You cannot take that.
+   >get tanks
+   You cannot take that.
+   >get all
+   Nothing to take.
+   >i
+   You currently have: acid, amethyst, glycerine, jar, lamp, ruby.
+   >
+
+From the above, we see that the "get all" command can get two objects at the
+same time, and it isn't confused by immovable objects like the fish or the
+tanks. (Note that the display message "Taken: jar ruby" is not quite like the
+original game, but it is what we will create in this assignment.) Moving on:
+   >s
+   Geological display
+   w>w
+   Museum lobby
+   You are in the main lobby for the Museum of Natural History.  In the center
+   of the room is the huge skeleton of a dinosaur.  Doors lead out to the
+   south and east.
+   There is a bone here.
+   >get bone
+   Taken.
+   >s
+   Museum entrance
+   You are in front of the Museum of Natural History.  A door leads into
+   the building to the north, and a road leads to the southeast.
+   >se
+   Main-Maple intersection
+   You are at the intersection of Main Street and Maple Ave.  Main street
+   runs north and south, and Maple Ave runs east off into the distance.
+   If you look north and east you can see many intersections, but all of
+   the buildings that used to stand here are gone.  Nothing remains except
+   street signs.
+   There is a road to the northwest leading to a gate that guards a building.
+   >get all
+   Nothing to take.
+   >get gate
+   You cannot take that.
+   >s
+   Post office
+   You are near the remains of a post office.  There is a mail drop on the
+   face of the building, but you cannot see where it leads.  A path leads
+   back to the east, and a road leads to the north.
+   >get all
+   Nothing to take.
+   >get mail
+   You cannot take that.
+   >x mail
+   It says ‘express mail’ on it.
+   >e
+   Meadow
+   You are in a meadow in the back of an old building.  A small path leads
+   to the west, and a door leads to the south.
+   There is a license here.
+   There is a silver here.
+   >i
+   You currently have: acid, amethyst, bone, glycerine, jar, lamp, ruby.
+   >get all
+   Taken: license silver
+   >i
+   You currently have: acid, amethyst, bone, glycerine, jar, lamp, license, 
+   ruby, silver.
+   >
+
+From the above, we see that we now have so many objects that they display on
+two lines. This output is different (and better) than in the original game
+(which had displayed each object on its own line); you must implement your
+output as I've shown above, as a comma-separated list. Moving on:
+   >s
+   Old Building hallway
+   You are in the hallway of an old building.  There are rooms to the east
+   and west, and doors leading out to the north and south.
+   >s
+   Building front
+   You are at the end of the road.  There is a building in front of you
+   to the northeast, and the road leads back to the southwest.
+   >sw
+   NE/SW road
+   You are on a northeast/southwest road.
+   >sw
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   There is a board here.
+   >
+
+In the above, I have uncovered the board, because I want you to be able to
+pick up the shovel, but we won't implement the "dig" command. Let's see the
+board:
+   >x board
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >x cpu
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >x chip
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >x card
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >get all
+   Taken: board
+   >ne
+   NE/SW road
+   >i
+   You currently have: acid, amethyst, board, bone, glycerine, jar, lamp, 
+   license, ruby, silver.
+   >x cpu
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >x board
+   The CPU board has a VAX chip on it.  It seems to have
+   2 Megabytes of RAM onboard.
+   >
+
+From the above, we see that all of the synonyms work, but the object always
+displays as "board". Moving on:
+   >sw
+   Fork
+   >w
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a boulder here.
+   >get boulder
+   You cannot take that.
+   >get tree
+   You cannot take that.
+   >get coconut
+   You cannot take that.
+   >get shovel
+   I do not see that here.
+   >get all
+   Nothing to take.
+   >
+
+The above further demonstrates the get command. Moving on:
+   >w
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a shovel here.
+   >get shovel
+   Taken.
+   >e
+   E/W Dirt road
+   There is a boulder here.
+   >e
+   Fork
+   >se
+   SE/NW road
+   You are on a southeast/northwest road.
+   There is a food here.
+   >get food
+   Taken.
+   >se
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   There is a bear here.
+   There is a key here.
+   >
+
+In the above, the key is already visible (like the board was already visible),
+because we won't implement feeding the bear to get the key. Moving on:
+   >get all
+   Taken: key
+   >get all
+   Nothing to take.
+   >l
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   There is a bear here.
+   >get bear
+   You cannot take that.
+   >sw
+   Hidden area
+   You are in a well-hidden area off to the side of a road.  Back to the
+   northeast through the brush you can see the bear hangout.
+   There is a bracelet here.
+   >get emerald
+   Taken.
+   >i
+   You currently have: acid, amethyst, board, bone, bracelet, food, glycerine,
+   jar, key, lamp, license, ruby, shovel, silver.
+   >get bracelet
+   I do not see that here.
+   >
+
+From the above, we see that the emerald bracelet displays as "bracelet".
+Moving on:
+   >ne
+   Bear hangout
+   There is a bear here.
+   >i
+   You currently have: acid, amethyst, board, bone, bracelet, food, glycerine,
+   jar, key, lamp, license, ruby, shovel, silver.
+   >drop all
+   You do not have that.
+   >
+
+From the above, we see that there is no "drop all" (because the original game
+doesn't have "drop all"). So we'll have to drop our items one-at-a-time:
+   >drop nitric
+   Dropped.
+   >drop amethyst
+   Dropped.
+   >drop board
+   Dropped.
+   >drop bone
+   Dropped.
+   >drop emerald
+   Dropped.
+   >drop food
+   Dropped.
+   >drop glycerine 
+   Dropped.
+   >drop jar
+   Dropped.
+   >drop key
+   Dropped.
+   >drop lamp
+   Dropped.
+   >drop license
+   Dropped.
+   >drop ruby
+   Dropped.
+   >drop shovel
+   Dropped.
+   >i
+   You currently have: silver.
+   >drop silver
+   Dropped.
+   >i
+   You currently have: .
+   >
+
+From the above, we see how the inventory displays whenit is empty. Moving on:
+   >nw
+   SE/NW road
+   >se
+   Bear hangout
+   There is an acid here.
+   There is an amethyst here.
+   There is a bear here.
+   There is a board here.
+   There is a bone here.
+   There is a bracelet here.
+   There is a food here.
+   There is a glycerine here.
+   There is a jar here.
+   There is a key here.
+   There is a lamp here.
+   There is a license here.
+   There is a ruby here.
+   There is a shovel here.
+   There is a silver here.
+   >
+
+From the above, we see how all of the get-able objects in the game display.
+Notice that the amethyst and the acid use the article "an" (eg, "There is
+an amethyst here."). Let's do a massive pickup:
+   >i
+   You currently have: .
+   >get all
+   Taken: acid amethyst board bone bracelet food glycerine jar key lamp
+   license ruby shovel silver
+   >
+
+From the above, we see how the "Taken:..." output displays when many objects
+are taken.
+
+We've now seen all the kinds of output that you'll need to create. You will be
+implementing the "get" and "drop" commands, as well as modifying the "i" and
+"hereitems" commands. Look for the README file later for guidance on how to
+do this. But first, let's finish playing the game:
+   >i
+   You currently have: acid, amethyst, board, bone, bracelet, food, glycerine,
+   jar, key, lamp, license, ruby, shovel, silver.
+   >nw
+   SE/NW road
+   >se
+   Bear hangout
+   There is a bear here.
+   >se
+   The bear is very annoyed that you would be so presumptuous as to try
+   and walk right by it.  He tells you so by tearing your head off.
+   
+   You are dead.
+   You have scored 0 out of a possible 90 points.
+   exit
+   %

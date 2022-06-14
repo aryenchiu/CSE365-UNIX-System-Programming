@@ -1,0 +1,645 @@
+Let's suppose you have finished writing the PA2 script, and have placed it in
+the PA2assignment directory. If so, then you'll be able to do the following:
+   % cd ~/PA2assignment
+   % bash
+   % source ./PA2.sh
+
+Don't worry about what the above lines do, just type them. The result will be:
+   % source ./PA2.sh
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   >
+
+As we see, the game is now running -- or so it seems. In fact, we are still on
+the unix prompt (but the PA2 script has changed the prompt symbol to a ">").
+Let's move around a little bit in the game:
+   >n
+   N/S tunnel
+   You are in a north/south tunnel.
+   >s
+   Museum station
+   >n
+   N/S tunnel
+   >
+
+From the above, we see that the game appears to be running -- although, in
+fact, there is no game running; it is just the standard unix prompt. You may
+wonder, "But if it is the standard prompt, then why wasn't there an error
+message when we typed 'n' or 's'?" The answer is that the 'n' and 's' commands
+were created as aliases (see Lecture 2 slide 12), by the PA2.sh script.
+
+The final effect is that the game seems to be running as expected, with the
+player being able to go between rooms. Also, the displayed message on entering
+a room is shorter when you are re-entering a room you have already visited.
+Playing some more:
+   >s
+   Museum station
+   >s
+   You cannot go that way.
+   >l
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   >n
+   N/S tunnel
+   >
+
+From the above, we see that the game knows about directions which you are not
+allowed to move. Also the "l" command let's us redisplay the full description.
+
+For the next part of this walkthrough, we'll see how the game moves through
+the directories we created in PA1. Given that we are currently in the N/S
+tunnel, we would expect to be able to see the descriptionB file in the
+current directory. But it turns out that the descriptionB file is in the
+previous directory, as we can see by using some unix commands (which we can
+do since the game is playing on the unix prompt):
+   >cd ->/dev/null; cat descriptionB; cd ->/dev/null
+   N/S tunnel
+   You are in a north/south tunnel.
+   >
+
+To keep the display simple. I've sent the output of "cd -" into the universal
+garbage file. (See Lecture, slides 72-73). So the question arises, "Why is my
+current room not my current directory? What then is my current directory?"
+Well, let's find the answer:
+   >pwd
+   /home/Me/D/objs
+   >ls -l ~/D
+   lrwxrwxrwx 1 Me None 29 Mar 5 12:09 /home/Me/D -> /home/Me/PA2assignment/dunnet
+   >
+   
+On your computer, the home directory will be different than "Me". But you will
+have a link "D", like the one shown above, in your home directory which links
+to where your dunnet game is located. As you will later learn, this link is
+made on the first line of your PA2.sh script. The second line of that script
+makes another link, to make it easier to throw away unwanted output:
+   >ls -l ~/X
+   lrwxrwxrwx 1 Me None 9 Jun 12  2020 /home/Me/X -> /dev/null
+   >
+
+OK. So, from the above, we learned that our current directory is ~/D/objs.
+What is this directory? Let's have a look:
+   >ls
+   acid        boulder   coins     fish       license    protoplasm  tank
+   all         box       computer  floppy     life       rms         tanks
+   amethyst    bracelet  cpu       food       mail       ruby        towel
+   axe         bus       dial      garbage    mona       shovel      train
+   beach       button    diamond   gate       nitric     silver      tree
+   bear        cabinet   dinosaur  glycerine  painting   skeleton    trees
+   bed         cable     disk      gold       palm       slip        urinal
+   bill        card      disposal  ibm        paper      slit        vax
+   bin         chip      drive     jar        pc         stallman    water
+   bins        chute     drop      key        pipe       statue      weight
+   blackboard  cliff     egg       ladder     pipes      statuette
+   board       coconut   emerald   lake       platinum   subway
+   bone        coconuts  ethernet  lamp       preserver  switch
+   >
+   
+These files are all of the objects in the dunnet game. The list includes some
+objects that you will recognize from homework 1 (eg, the amethyst), but the
+list also includes some objects from parts of the game that we will not be
+implementing (eg, the axe). There are also objects with more than one name,
+such as the nitric acid; in these cases both filenames exist. Note that you
+do not need to create these files, as I have given you the objs directory.
+
+So what is in these files? Let's take a look:
+   >cat amethyst
+   amethyst
+   >cat coconut
+   coconut
+   >cat coconuts
+   coconuts
+   >cat nitric
+   nitric
+   >cat acid
+   acid
+   >
+
+What is the point of these files? Well, it has to do with the way that the
+homework is using aliases to make the unix prompt act like the dunnet game.
+The actual game has commands that take arguments, but the unix alias command
+(see Lecture 2 slide 12) does not allow arguments. There is a way to handle
+this problem. Consider the following:
+   >alias echoArg='cat <'
+   >echoArg amethyst
+   amethyst
+   >echoArg coconut
+   coconut
+   >echoArg coconuts
+   coconuts
+   >echoArg nitric
+   nitric
+   >echoArg anythingNotInMyList
+   -bash: anythingNotInMyList: No such file or directory
+   >
+
+See what happened? Each of the above echoArgs was replaced with 'cat <', which
+means that the above really meant:
+   >alias echoArg='cat <'
+   >echoArg amethyst    ->      >cat< amethyst  (The file named "amethyst"
+   amethyst                     amethyst         has the contents "amethyst".)
+   >echoArg coconut     ->      >cat< coconut   (The file named "coconut"
+   coconut                      coconut          has the contents "coconut".)
+   >echoArg coconuts    ->      >cat< coconuts  (The file named "coconuts",
+   coconuts                     coconuts         has the contents "coconuts".)
+   >echoArg nitric      ->      >cat< nitric    (The file named "nitric",
+   nitric                       nitric           has the contents "nitric".)
+   >echoArg anythingNotInMyList >cat< anythingNotInMyList (No such file, so
+   -bash: anythingNotInMyList: No such file or directory   we get this error.)
+   >
+
+Now that we understand the concept, let's see how it can be used to capture
+the command line argument and store it into a file so that it can be processed
+in whatever way it needs to be processed. Consider this example:
+   >alias echoArg2='(cat>~/T;echo `cat ~/T` has `wc -c<~/T`-1 characters)2>~/X<'
+   >echoArg2 amethyst
+   amethyst has 9-1 characters
+   >echoArg2 key
+   key has 4-1 characters
+   >echoArg2 nitric
+   nitric has 7-1 characters
+   >echoArg2 coconuts
+   coconuts has 9-1 characters
+   >echoArg2 anythingNotInMyList
+   >
+
+The only limitation of the above approach is the final line, where a filename
+that is not in the list produced no output (actually it crashed, but the error
+message was suppressed by the alias's use of the "2>~/X".)
+
+OK. So since we need to do this complicated work-around to allow arguments for
+our aliases, it means that we have to be in the ~/D/objs directory whenever we
+type commands to play the game. The aliases can change directories, but each
+alias of the game must end in the state that the current directory is ~/D/objs
+and the previous directory is the current room.
+
+Now that all of that is understood, let's keep playing the game:
+   >n
+   North end of N/S tunnel
+   You are at the north end of a north/south tunnel.  Stairs lead up and
+   down from here.  There is a garbage disposal here.
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n
+   >ls
+   d  descriptionC  disposal  garbage  u
+   >ls ..
+   descriptionB  n
+   >ls ../..
+   descriptionA  n
+   >ls d
+   amethyst  descriptionD  ne
+   >ls d/ne/
+   cabinet  computer  descriptionE  ibm  vax
+   >ls u
+   descriptionF  w
+   >
+
+From the above we see the files created in the first homework. However, these
+rooms have a hidden file:
+   >ls -A
+   .v  d  descriptionC  disposal  garbage  u
+   >ls -A ..
+   .v  descriptionB  n
+   >ls -A ../..
+   .v  descriptionA  n
+   >ls -A d
+   amethyst  descriptionD  ne
+   >ls -A d/ne/
+   cabinet  computer  descriptionE  ibm  vax
+   >ls -A u
+   descriptionF  w
+   >
+
+See the ".v" files above? What are they? Well notice that only rooms A, B, and
+C have these files. Also, see that we have only actually visited those three
+rooms. So the .v file is what your script uses to decide whether to display
+the full room description, or just the first line. See how room F can be given
+a .v file (also notice that I need to "cd -" before I do anything else):
+   >ls -A u
+   descriptionF  w
+   >cd -
+   /home/Me/D/objs
+   >u
+   Top of subway stairs
+   You are at the top of some stairs near the subway station.  There is
+   a door to the west.
+   >d
+   North end of N/S tunnel
+   >u
+   Top of subway stairs
+   >d
+   North end of N/S tunnel
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n
+   >ls -A u
+   .v  descriptionF  w
+   >
+
+OK, so let's move on to look at some of the objects in the rooms:
+   >ls -A
+   d  descriptionC  disposal  garbage  u
+   >ls -A d
+   amethyst  descriptionD  ne
+   >cat garbage
+   I see nothing special about that.
+   >cat disposal
+   I see nothing special about that.
+   >cat d/amethyst
+   I see nothing special about that.
+   >cat u/w/w/fish
+   The fish look like they were once quite beautiful.
+   >cd -
+   /home/Me/D/objs
+   >x garbage
+   I see nothing special about that.
+   >x amethyst
+   I do not see that here.
+   >x fish
+   I do not see that here.
+   >x anythingThatIsntAGameObject
+   >
+
+From the above, we see that there is an x command for examining objects. It
+works just like in the real game, except that the attempt to examine a badly
+named object didn't produce the expected "I don't know what that is." message.
+The earlier discussion about the ~/D/objs directory should make it clear why
+we can't create that error message from the game.
+
+If you look closely, there is another difference versus the original game.
+Instead of saying "I don't see that here.", we say, "I do not see that here." 
+The reason for this is because you have not yet learned how to use the "'"
+symbol. As slide 12 of Lecture describes, you will use "'" in you aliases (by
+saying "alias name='...'", but you should not use a "'" in any other way. So
+we have chosen to turn the game's "don't" into a "do not".
+
+Moving on:
+   >l
+   North end of N/S tunnel
+   You are at the north end of a north/south tunnel.  Stairs lead up and
+   down from here.  There is a garbage disposal here.
+   >d
+   Bottom of subway stairs
+   You are at the bottom of some stairs near the subway station.  There is
+   a room to the northeast.
+   Here there is: amethyst
+   >u
+   North end of N/S tunnel
+   >d
+   Bottom of subway stairs
+   Here there is: amethyst
+   >
+
+From the above, we see that some objects (such as the amethyst) display every
+time you enter the room. Other objects (such as the garbage disposal) don't
+display.
+
+Moving on:
+   >x amethyst
+   I see nothing special about that.
+   >x garbage
+   I do not see that here.
+   >x lamp
+   The lamp is hand-crafted by Geppetto.
+   >i
+   You currently have: lamp
+   >
+
+From the above, we see that the current room does not have the garbage, so
+you get the error message when you try to examine it. But the lamp didn't give
+an error message. We then found out why: it is in our inventory. This means
+that you will have to create an "i" alias.
+
+The inventory is one of the directories inside dunnet (and we access it by the
+"D" link):
+   >ls ~/D
+   inv  obj  objs  rooms
+   >ls ~/D/inv/
+   lamp
+   >cat ~/D/inv/lamp
+   The lamp is hand-crafted by Geppetto.
+   >
+
+But not every command is implemented in this programming assignment #2. Note:
+   >drop lamp
+   sh: drop: command not found
+   >get garbage
+   sh: get: command not found
+   >
+
+Without get or drop implemented, we lack the commands we need to change our
+inventory. But we can still change it directly with unix (not game) commands:
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n/d
+   >mv amethyst ~/D/inv/
+   >ls ~/D/inv
+   amethyst  lamp
+   >cd -
+   /home/Me/D/objs
+   >
+
+In the above, I just moved the amethyst from my current room to the inventory.
+So I should be able to see it with "i", but not with "l". And I should be able
+to "x" it from any room:
+   >i
+   You currently have: amethyst  lamp
+   >l
+   Bottom of subway stairs
+   You are at the bottom of some stairs near the subway station.  There is
+   a room to the northeast.
+   >x amethyst
+   I see nothing special about that.
+   >u
+   North end of N/S tunnel
+   >x amethyst
+   I see nothing special about that.
+   >
+
+From the above, we have learned how to test objects in our inventory. We can
+also use unix commands to find a way to drop them:
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n
+   >mv ~/D/inv/* .
+   >ls
+   amethyst  d  descriptionC  disposal  garbage  lamp  u
+   >cd -
+   /home/Me/D/objs
+   >i
+   You currently have:
+   >l
+   North end of N/S tunnel
+   You are at the north end of a north/south tunnel.  Stairs lead up and
+   down from here.  There is a garbage disposal here.
+   Here there is: amethyst lamp
+   >d
+   Bottom of subway stairs
+   >u
+   North end of N/S tunnel
+   Here there is: amethyst lamp
+   >u
+   Top of subway stairs
+   >
+   d
+   Bottom of subway stairs
+   >u
+   North end of N/S tunnel
+   Here there is: amethyst lamp
+   >
+
+Before moving on, consider that only certain objects can be picked up, and
+these are the only file names that need to be tested to see if they work with
+the "i" command. A full list of the gettable objects is provided for you here:
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n
+   >cd ~/PA2assignment/possibledunnetdircontents/
+   >ls *[^vjs]
+   acid      bone      chip     food       key      nitric  silver
+   amethyst  bracelet  cpu      glycerine  lamp     ruby
+   board     card      emerald  jar        license  shovel
+   >
+
+What is this above possibledunnetdircontents directory? And why did I type
+"ls *[^vjs]" rather than just "ls"? The reason is that this directory will
+be used in Programming Assignment #3, and it contains a few other items (for
+reasons that won't matter until Assignment #3). And it just-so-happens that
+those other items end in "v", "j", or "s", while none of the getable items
+end in any of those three letters:
+   >ls
+   acid      bone      chip     food       jar   license  objs   shovel
+   amethyst  bracelet  cpu      glycerine  key   nitric   rooms  silver
+   board     card      emerald  inv        lamp  obj      ruby
+   >cd ~/D/objs
+   >
+
+Considering the above list of gettable objects, there are a few with synonyms:
+nitric=acid, cpu=chip=card=board, and emerald=bracelet. When testing these
+objects for "i", you must move all of the synonyms into ~/D/inv. Moreover, the
+output of "i" will only display "acid" or "board" or "emerald", respectively.
+In other words, if I cheat and put those filenames into my inventory, I get:
+   >ls ~/D/inv/
+   >i
+   You currently have:
+   >cp nitric acid cpu chip card board emerald bracelet ~/D/inv
+   >ls ~/D/inv/
+   acid  board  bracelet  card  chip  cpu  emerald  nitric
+   >i
+   You currently have: acid  board  bracelet
+   >rm ~/D/inv/*
+   >i
+   You currently have:
+   >
+
+Now that we've seen how the inventory works, let's move on to the locked door:
+   >l
+   Top of subway stairs
+   You are at the top of some stairs near the subway station.  There is
+   a door to the west.
+   >w
+   Classroom
+   You are in a classroom where school children were taught about natural
+   history.  On the blackboard is written, ‘No children allowed downstairs.’
+   There is a door to the east with an ‘exit’ sign on it.  There is another
+   door to the west.
+   Here there is: glycerine
+   >e
+   The door is locked.
+   >w
+   Marine life area
+   You are in the marine life area.  The room is filled with fish tanks,
+   which are filled with dead fish that have apparently died due to
+   starvation.  Doors lead out to the south and east.
+   Here there is: jar ruby
+   >e
+   Classroom
+   Here there is: glycerine
+   >w
+   Marine life area
+   Here there is: jar ruby
+   >e
+   Classroom
+   Here there is: glycerine
+   >e
+   The door is locked.
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w
+   >ls
+   blackboard  descriptionG  e  glycerine  s  w
+   >cat e
+   The door is locked.
+   >cd -
+   /home/Me/D/objs
+   >
+
+From the above, we see that the file named "e" is somehow responsible for the
+door being locked. What this means is that your alias for the "e" command,
+which you will implement inside of PA2.sh, will need to do something with this
+"e" file. The instructions on the PA2.sh file will give more guidance.
+
+The next thing to consider is the fact that this classroom is part of a 4-room
+cycle:
+   >s
+   Maintenance room
+   You are in some sort of maintenance room for the museum.  There is a
+   switch on the wall labeled ‘BL’.  There are doors to the west and north.
+   Here there is: acid
+   >w
+   Geological display
+   You are in the geological display.  All of the objects that used to
+   be on display are missing.  There are rooms to the east, west, and
+   north.
+   >n
+   Marine life area
+   Here there is: jar ruby
+   >e
+   Classroom
+   Here there is: glycerine
+   >e
+   The door is locked.
+   >
+
+So we are back in the classroom where we started. Let's think a bit more about
+the link that created the 4-room cycle:
+   >w
+   Marine life area
+   Here there is: jar ruby
+   >s
+   Geological display
+   > cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/s/w
+   >
+
+From the above, we see that the current directory path (.../rooms/n/n/u/w/s/w)
+does not match with how we reached this room (in the walkthrough above, the
+last movement we did was "s", but our current path ends in w). This means that
+we are looking at the physical link, not the symbolic one (See slide #180 of
+Lecture 2). If we had simply done a "cd s", it would not have looked the same:
+   >cd -; cd ~/D/objs
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/s/w
+   >n
+   Marine life area
+   Here there is: jar ruby
+   >cd -
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/w
+   >cd s
+   >pwd
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/w/s
+   >pwd -P
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/s/w
+   >cd `pwd -P`
+   >pwd
+   /home/Me/PA2assignment/dunnet/rooms/n/n/u/w/s/w
+   >cd ~/D/objs
+   >n
+   Marine life area
+   Here there is: jar ruby
+   >s
+   Geological display
+   >
+
+OK, let's quickly se the rest of the game: 
+   >w
+   Museum lobby
+   You are in the main lobby for the Museum of Natural History.  In the center
+   of the room is the huge skeleton of a dinosaur.  Doors lead out to the
+   south and east.
+   Here there is: bone
+   >s
+   Museum entrance
+   You are in front of the Museum of Natural History.  A door leads into
+   the building to the north, and a road leads to the southeast.
+   >se
+   Main-Maple intersection
+   You are at the intersection of Main Street and Maple Ave.  Main street
+   runs north and south, and Maple Ave runs east off into the distance.
+   If you look north and east you can see many intersections, but all of
+   the buildings that used to stand here are gone.  Nothing remains except
+   street signs.
+   There is a road to the northwest leading to a gate that guards a building.
+   >sw
+   You cannot go that way.
+   >n
+   You cannot go that way.
+   >e
+   You cannot go that way.
+   >s
+   Post office
+   You are near the remains of a post office.  There is a mail drop on the
+   face of the building, but you cannot see where it leads.  A path leads
+   back to the east, and a road leads to the north.
+   >x mail
+   It says ‘express mail’ on it.
+   >x drop
+   It says 'express mail' on it.
+   >s
+   You cannot go that way.
+   >e
+   Meadow
+   You are in a meadow in the back of an old building.  A small path leads
+   to the west, and a door leads to the south.
+   Here there is: license silver
+   >s
+   Old Building hallway
+   You are in the hallway of an old building.  There are rooms to the east
+   and west, and doors leading out to the north and south.
+   >w
+   Computer room
+   You are in a computer room.  It seems like most of the equipment has
+   been removed.  There is a VAX 11/780 in front of you, however, with
+   one of the cabinets wide open.  A sign on the front of the machine
+   says: This VAX is named ‘pokey’.  To type on the console, use the
+   ‘type’ command.  The exit is to the east.
+   The panel lights are steady and motionless.
+   >e
+   Old Building hallway
+   e>e
+   Mailroom
+   You are in a mailroom.  There are many bins where the mail is usually
+   kept.  The exit is to the west.
+   >w
+   Old Building hallway
+   >s
+   Building front
+   You are at the end of the road.  There is a building in front of you
+   to the northeast, and the road leads back to the southwest.
+   >n
+   You can't go that way
+   >ne
+   You don't have a key that can open this door.
+   >sw
+   NE/SW road
+   You are on a northeast/southwest road.
+   >sw
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   >se
+   SE/NW road
+   You are on a southeast/northwest road.
+   Here there is: food
+   >se
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   Here there is: bear
+   >
+
+In the original PA1, I had you name the area to the southwest as ".sw". But
+in this new version, it is just "sw", and you can move into it just like any
+other directory:
+   >sw
+   Hidden area
+   You are in a well-hidden area off to the side of a road.  Back to the
+   northeast through the brush you can see the bear hangout.
+   Here there is: bracelet
+   >ne
+   Bear hangout
+   Here there is: bear
+   >se
+   The bear is very annoyed that you would be so presumptuous as to try
+   and walk right by it.  He tells you so by tearing your head off.
+   
+   You are dead.
+   You have scored 0 out of a possible 90 points.
+   exit
+   %
+
+When you died, the prompt changed because the game ended. The aliases no
+longer work.

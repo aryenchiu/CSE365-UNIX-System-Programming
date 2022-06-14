@@ -1,0 +1,243 @@
+In this assignment, we will use a sed program to re-implement the movement
+commands of the dunnet game.
+
+Let's see how it works:
+  % cd ~/D/rooms/n/n/u/w
+  % head -1 descriptionG
+  Classroom
+  % ls --color=never
+  blackboard  descriptionG  e  glycerine  s  w
+  % ( echo n ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  echo You can\'t go that way.
+  %
+
+In the above, we went into one of the rooms with no exit to the north, but we
+tried going north anyway. It gave the message that "You cannot go that way."
+But there are some unusual steps in the above code. Let us note them:
+  1. Sed's input came from "( echo n ; pwd ; ls -l --color=never )|...". Why?
+      - "echo n"   <== This prints an "n", to simulate that the game player
+                       has typed the "n" command.
+      - pwd        <== Movement needs to know the path, in order to support
+                       backtracking to the parent directory.
+      - ls         <== We need to know what is in our directory, in order to
+                       know which directions are available.
+      - ls -lA     <== We need to know which listed directions are files (ie,
+                       directions you can't move in), versus which are either
+                       subdirectories or links to directories (ie, directions
+                       you can move in).
+      - --color==never <== This is needed because some people's ls commands
+                       insert color codes that we don't want sent into sed.
+      - (...;...;...)| <== These parentheses allow the outputs of all three
+                       above commands to get merged into one output stream.
+
+  2. Sed's output is a UNIX command:
+      - echo You cannot go that way <== The use of this "echo" is a clue that
+                       we will need to do something more with this output, in
+                       other parts of the homework. (In fact, what we'll be
+                       doing with this output is to send it on to an awk
+                       command: (...;...;...)|sed -f ~/.../move.sed | awk ...
+
+
+Let's try to moving in another direction, back through the locked door:
+  % head -1 descriptionG
+  Classroom
+  You are in a classroom where school children were taught about natural
+  history.  On the blackboard is written, ‘No children allowed downstairs.’
+  There is a door to the east with an ‘exit’ sign on it.  There is another
+  door to the west.
+  % ( echo e ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  cat e
+  % cat e
+  The door is locked.
+  %
+
+From the above, we see that the sed program was able to use the output of
+"ls -l" to determine that the "e" in the current directory was a file. (As
+you will remember, we use such files to create locked doors like the one
+above.)
+
+Let's try some other directions:
+  % ( echo s ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  cd s
+  % ( echo w ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  cd w
+  % cd w
+  %
+
+From the above, we see that the outputs "cd s" and "cd w" do indicate that
+you can move in those directions.
+
+Let's see this new room:
+  % ls --color=never
+  descriptionJ  fish  jar  n  rename  ruby  s  tank
+  % ( echo e ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  cd ..
+  %
+
+From the above, we see that the "cd .." works correctly. (We also see that
+this new assignment only has "tank" (not "tanks"), but that detail won't
+affect the sed program.)
+
+
+Let's try some other directions:
+  % ( echo w ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  echo You cannot go that way.
+  % ( echo s ; pwd ; ls -lA --color=never ) | sed -f ~/PA5assignment/move.sed
+  cd s
+  %
+
+From the above, we see that the symbolic link also works.
+
+Well, that is the end of the movement behaviors.
+
+But what if the player gives a command other than a direction? Let's see:
+  % ls -A
+  descriptionJ  fish  jar  n  rename  ruby  s  tank
+  % ( echo get jar ; pwd ; ls -lA --color=never ) | sed -f ~/move.sed
+  @
+  get jar
+  
+  
+  descriptionJ
+  fish
+  jar
+  ruby
+  
+  tank
+  %
+
+What is the above? It contains 4 parts:
+  - @ <== This line will be used to tell awk that the command isn't movement.
+  - get jar  <==Since the sed program didn't handle this command, it needs to
+                be passed on to awk (so that awk can implement it).
+  - some blank lines <==These correspond to input lines that our sed program
+                will zap. The awk program will end up ignoring such lines.
+  - descriptionJ<==The rest of the lines are the items in the directory list,
+    fish           but with the direction files being zapped.
+    ...
+
+
+A similar output is made for any passed-in command that isn't a direction:
+  % ( echo x fish ; pwd ; ls -lA --color=never ) | sed -f ~/move.sed
+  @
+  x fish
+  
+  
+  descriptionJ
+  fish
+  jar
+  ruby
+  
+  tank
+  % ( echo nww ; pwd ; ls -lA --color=never ) | sed -f ~/move.sed
+  @
+  nww
+  
+  
+  descriptionJ
+  fish
+  jar
+  ruby
+  
+  tank
+  % ( echo 1 2 3 4 ; pwd ; ls -lA --color=never ) | sed -f ~/move.sed
+  @
+  1 2 3 4
+  
+  
+  descriptionJ
+  fish
+  jar
+  ruby
+  
+  tank
+  %
+
+
+
+OK. So that is the desired output.  Now how to do it?
+
+
+The move.sed program can be divied into 5 sections:
+
+Section 1: This handles the output for when the command isn't a direction.
+           This section uses "n" to read all input lines, then it uses "q".
+           Therefore, to reach Section 2, you know it is a direction.
+
+
+Section 2: This cleans up the input, to remove unnecessary information.
+           For example if we added a print statement to show what enters
+           Section 2, we would see:
+             % ( echo s junk; pwd ; ls -lA --color=never ) |sed -f ~/move.sed
+             s junk
+             /home/Me/PA5assignment/PA5dunnet/rooms/n/n/u/w/w
+             total 6
+             -rw-r--r--  1 Me None 203 Feb 15 01:12 descriptionJ
+             -rw-r--r--  1 Me None  51 Feb  2 23:28 fish
+             drwxr-xr-x+ 1 Me None   0 Apr 30 15:31 jar
+             -rw-r--r--  1 Me None  34 Feb  2 23:50 ruby
+             lrwxrwxrwx  1 Me None   6 Feb  2 20:25 s -> ../s/w
+             -rw-r--r--  1 Me None  34 Feb  2 23:50 tank
+             cd s  <== This line is not related to Section 2.
+             %
+
+           but if we then removed that print, and instead put one at the end
+           of Section 2, we would see:
+             % ( echo s junk; pwd ; ls -lA --color=never ) |sed -f ~/move.sed
+             s
+             w
+             6
+             descriptionJ
+             fish
+             jar->
+             ruby
+             s->
+             tank
+             cd s  <== This line is not related to Section 2.
+             %
+
+           See how it took out the unneeded information. Note in particular:
+            - The "s -> ../s/w" simplified to "s->", which has no spaces.
+            - The "jar" is a directory, and that is why it became "jar->".
+              (For the "jar" it isn't important. But the "->" will also be
+              added to ordinary subdirectories, which are directions you can
+              move in.)
+            - The "6" came from the "total 6" line, and it will not matter.
+            - The lines came into Section 2, one-by-one. But Section 2 stores
+              them together in the hold space. Then, when the last line is
+              reached, all of the lines are loaded, using a "g".
+              So, what's the point? Answer: the above output from Section 2
+              is all printed at one with one "p". (In contrast, the lines
+              entering Section 3 were printed on individual iterations.)
+   
+
+Section 3: This deals with the case that the requested movement direction is
+           in the "ls" listing.
+           If the listing ends with a "->", then do a "cd"; otherwise do a
+           "cat" to show the error message about not being able to move in
+           that direction.
+           The section ends with a "d", so you only enter Section 4 if you
+           didn't run Section 3.
+           Hint: You'll need to use regular expression back-referencing to
+                 find out id the movement direction repeats.
+           Hint: You'll need to use "\>" to ensure that you don't mistakenly
+                 match "n" with "ne" (for example). 
+
+
+Section 4: This section prepares things for Section 5 (see below).
+           This section flips (using "y") the directions in the first line
+           of input. (So "n" becomes "s", "d" becomes "u", "ne" becomes "sw")
+           But note: All of the input is already now in the pattern space.
+           Hint: Use the hold space and "s" commands to separate the first
+                 input line from the rest, so you can run "y" on only it.
+           Hint: You can only use "y" on the pattern space, but "x" can let
+                 you work with the hold space.
+
+
+Section 5: Like in Section 3, this Section 5 also deals with the case that
+           the (flipped) requested movement direction matches with a later
+           line (in this case, it must match to the second line, which came
+           from pwd).
+
+           If it matches, it prints "cd .."; Otherwise, it prints "echo You
+           can\'t go that way."

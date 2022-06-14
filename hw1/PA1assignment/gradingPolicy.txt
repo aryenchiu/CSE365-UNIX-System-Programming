@@ -1,0 +1,89 @@
+This is a large class. Unless each of you follows the below rules, the grading
+work becomes so hard. So I REQUIRE you to FOLLOW THESE RULES:
+
+1. Follow the rules on how to name files, on how to submit things, etc.
+   Don't email the file to me, but submit it. But, that being said, if you are
+   unable to submit it to the cyberuniversity, for some reason (such as because
+   you aren't yet enrolled in the course), then email the assignment to me
+   immediately. If you wait until the next day, then it will not be accepted.
+   (My email is stevewhaga@yahoo.com).
+
+
+2. Submit exactly one file named: "<your student ID>.tar". You will, of course,
+   replace "<your student ID>" with your unique ID number (B9..., M9..., etc).
+
+
+3. Submit on time. Submissions made after the deadline will be ignored.
+   (By the way, if you don't turn in your assignments, you will probably Fail
+    The Class. That's a Fact. So start early and ask questions.)
+
+
+4. Submit through the cyber university. Lecture 1 (which you can find on this
+   course's cyberuniversity website page, that is: the same page you downloaded
+   this programming assignment from) has a description at the end about how to
+   upload the homework. These slides cannot be understood from a printout; they
+   must be played to see the animation that explains the uploading process.
+   If you submit a second time, it will overwrite your first submission. If you
+   submit after the deadline (11:59pm), then the system will not allow you to
+   submit. (At that point you should immediately email your attached homework
+   to me at stevewhaga@yahoo.com)
+
+
+5. Test your answer, versus the provided expectedOutput file. You should
+   already have read the PA1assignment.txt file, which explains both how to
+   use the provided "findYourOutput.exe" program to create the "yourOutput"
+   file, and how to use diff to verify that it has no differences to the
+   "expectedOutput" file.
+
+   If diff gives no output then you've passed the basic test.
+
+   In the above example, the student will get a grade of at least 50%. The
+   student may not get 100%, however, because the basic test only checks for
+   the file names, not their contents, permissions, or link targets.
+   If you see output when you run diff, then you will lose 1% for every line
+   produced by diff. You should find out what the problem is before submitting.
+
+
+6. Test your tar file before submitting. Every year, some student submits a tar
+   file whose size is 0 bytes, or which isn't able to be untarred. So you must
+   test it before submitting it. You do this by following these steps (assuming
+   that your tar file is in your current directory):
+   % mkdir testir
+   % cd testdir
+   % tar -xvf ../[BMJID][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].tar
+   %
+
+   It should display a long message listing all of the files it is creating
+   from the tar file. Then to clean up after our test:
+   % cd -
+   % rm -rf testdir
+   %
+
+       
+7. Don't cheat. You may discuss the assignment with your classmates. Discussion
+   can be quite helpful to your learning -- IF you ONLY talk about the concepts
+   of the assignment. If, however, you discuss specific implementation details,
+   then you're not helping others learn; you're just doing their work for them.
+
+   You CANNOT share code. You CANNOT show another student ANY part of your
+   answer to the assignment. You CANNOT let another student look over your
+   shoulder at your code. You CANNOT describe your answer, except in a general
+   way. Think of these assignments as take-home exams.
+
+   You CAN discuss what the assignment's requirements are (eg, questions over
+   the meaning of the English). You CAN give general tips on how to implement
+   the assignment. If a student describes to you what isn't working in their
+   solution, you CAN give suggestions on how to try to fix it -- but you CANNOT
+   look at their code and debug it for them. Instead, try using a different
+   example that suffers from the same problem, and help your classmate to debug
+   that example.
+   
+   Once again: you CANNOT let a student look over your shoulder when your code
+   is on the screen.
+
+   If students are found to be sharing work, they will receive a 0 for this
+   course, or worse. We always look for evidence of cheating, so don't do it.
+   (In any event, even if you do not get caught, a student who copies the
+   homework will not learn the material, so they will fail the exam.)
+
+   If you have questions about these rules, you may email me.

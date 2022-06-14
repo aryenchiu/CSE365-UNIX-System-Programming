@@ -1,0 +1,2 @@
+cd /home/Me/testprograms/unixhw1/PA1/PA1/rooms
+LANG=c find . -name "*" | tr Z @ | sed 's,/n/n/u/w/s/w/w/s/se/nw,&_,;s,/n/n/u/w/e,&_,;s,/n/n/u/w/s/w/w/s/se/s/e/s/n,&_,;s,/n/n/u/w/s/w/w/s/se/s/e/s/s/n,&_,;s,sw/sw/se/se/se,&_,;s,[.]sw,Z&,;s,/\([ewnsud]\),/Z\1,g;s,Z\([a-z]*\)_,\1,;s/Z\([duwes][^/_][^/_]\)/\1/g'|sort -f| tr -d Z_ | tr @ Z > ~/PA1assignment/yourOutput

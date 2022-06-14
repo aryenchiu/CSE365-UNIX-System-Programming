@@ -1,0 +1,647 @@
+                            UNIX System Programming
+                           Programming Assignment #2
+
+Due: Friday, March 25  at  11:59 pm. 
+     Submissions made after the deadline will be ignored.
+
+Submission method: Submit one file named "PA2.sh".
+                   You will post to the course website, just like the previous
+                   assignment. 
+
+Getting help:   - Professor office hours: Monday 12:00-2:00 either in room
+                  5012 or room 9037, and Friday 10:00-12:00 in room 9037.
+                  Or by email at stevewhaga@yahoo.com (please use English).
+                - The TA is also available to answer your questions.
+                - Questions about the assignment can be posted to the 
+                  Discussion Forum.
+                - You may also discuss the ideas of the assignment with your
+                  classmates. Such discussions can be quite helpful to your 
+                  learning -- IF you ONLY talk about the general concepts of
+                  the steps of the assignment.
+                  - If, however, you tell other students the specific details
+                    of your implementation, then you aren't helping each other
+                    to learn; you are just doing the work for them.
+                    In other words, you are cheating. You CANNOT show another
+                    student ANY part of the answer to the assignment.
+
+Cheating policy:  We encourage students to form study groups. But this doesn't
+                  mean sharing code. If students are found to be sharing work,
+                  they can receive a 0 for the entire course, or worse.
+                  It is cheating to let another student see your work, or to 
+                  let them look over your shoulder when your code is on the
+                  screen.
+                  A good way to know you cheated: if you have code that is in
+                  your solution just because another student told you to put
+                  it there, but you don't actually understand it.
+                  If you are still unsure, you can ask the TA for more
+                  explanation.
+                  We always look for evidence of cheating, so don't do it.
+                  (In any event, even if you do not get caught, those who 
+                  copy the homework will not learn the material, so they 
+                  will fail the exam.)
+
+Most Important    The programming assignments are a large part of the grade.
+Things to Know:   This large point value means that, if you don't do them, you
+                  will likely fail.
+                  The large point value also explains why the policy against
+                  cheating is so strictly enforced.
+                  
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ - - - - - - - - - - - - - - -  Project Overview - - - - - - - - - - - - - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+The goal of this new assignment is to use the directories from assignment 1 to
+play the game dunnet. Although we will not implement all of the commands, we
+will implement enough to demonstrate the power of UNIX.
+
+To truly show the power of the UNIX philosophy of combining simple tools to
+do something complex, you will only be allowed to use commands and techniques
+from lectures 1-3.
+
+Now, in the first few lectures, we did not learn variables or loop structures.
+So how can we make a game? The answer is that we will convert the UNIX command
+prompt into the game. The key idea is to use aliases to create UNIX commands
+for the game commands. The details of how to do this are given below.
+
+You have probably read the walkthrough file from the earlier posting, so you
+already know what this assignment is about. As a part of the tar file that you
+untarred to read this README file, I have attached a new version of that
+walkthrough, where I've fixed a few small typos.
+
+If you are reading this README file, then you have untarred PA2assigment.tar,
+so let's look in that directory:
+  % cd PA2assignment
+  % ls
+  PA1.tar                README               possibledunnetdircontents
+  PA2walkthroughRev.txt  allroomdirsandfiles
+  %
+
+The above listing shows the same PA1.tar file from the earlier website post.
+It is my solution to programming assignment 1. Regardless of whether you
+completed your assignment #1, you can use my supplied PA1.tar file for this
+current assignment. (In fact, my file has few differences to your assignment
+#1 solutions, so you need to use my PA1.tar file.)
+
+The above contents also show the possibledunnetdircontents directory that was
+discussed about in the earlier posted walkthrough.
+
+The above list also shows an allroomdirsandfiles directory. Let's look in it:
+  % cd allroomdirsandfiles; ls
+  acid        coconuts      descriptionK  descriptionY  key       sw
+  amethyst    computer      descriptionL  descriptionZ  license   switch
+  bear        cpu           descriptionM  dinosaur      mail      tank
+  bin         d             descriptionN  disposal      n         tanks
+  bins        descriptionA  descriptionO  drop          ne        tree
+  blackboard  descriptionB  descriptionP  e             nitric    trees
+  board       descriptionC  descriptionQ  emerald       nw        u
+  bone        descriptionD  descriptionR  fish          palm      vax
+  boulder     descriptionE  descriptionS  food          ruby      w
+  bracelet    descriptionF  descriptionT  garbage       s
+  cabinet     descriptionG  descriptionU  gate          se
+  card        descriptionH  descriptionV  glycerine     shovel
+  chip        descriptionI  descriptionW  ibm           silver
+  coconut     descriptionJ  descriptionX  jar           skeleton
+  %
+
+See what it is? It is a list of every possible file or directory that could
+possibly be found in any room. (There are special cases "w", "n", "nw", "ne",
+and "sw" where it is sometimes a file and sometimes a subdirectory, in these
+cases, I made it a file.) So, why did I give you this directory? Well it will
+help you to test your wildcard patterns in some of the code below.
+
+Looking again at the listing of the contents of the PA2assignment directory
+from earlier, we see there is one more provided file, PA2walkthrough.txt; it
+is a revised version of the walkthrough that I posted earlier. If you haven't
+yet read the walkthrough, you should read it to get an understanding of what
+you need to implement (use this new version). For most of you, I would hope
+that you have already read the earlier version of the walkthrough, so I'll
+now describe the small updates which I have made to it in this new version.
+
+Assuming that the old walkthrough is in your home:
+% cd PA2assignment
+% diff ~/PA2walkthrough.txt PA2walkthroughRev.txt | head -14
+48,52c48,54
+< For the next part of this walkthrough, how the game moves through directories
+< we created in PA1. given that we are currently in the N/S tunnel, we would
+< expect to be able to see the descriptionB file in the current directory, but
+< it turns out that it is in the previous directory, as we can see by using some
+< unix commands (which we can do since the game is playing on the unix prompt):
+---
+>
+> For the next part of this walkthrough, we'll see how the game moves through
+> the directories we created in PA1. Given that we are currently in the N/S
+> tunnel, we would expect to be able to see the descriptionB file in the
+> current directory. But it turns out that the descriptionB file is in the
+> previous directory, as we can see by using some unix commands (which we can
+> do since the game is playing on the unix prompt):
+%
+
+From the above we see that I have simply changed the text to still say the
+same idea as before, just more clearly.
+
+We've just looked at the first 14 lines of the diff out, let's look at the
+next 29 lines:
+% diff ~/PA2walkthrough.txt PA2walkthroughRev.txt | head -43 | tail -29
+72c74
+< makes another link, to make it easier to throw way unwanted output:
+---
+> makes another link, to make it easier to throw away unwanted output:
+77c79
+< OK. So, form the above, we learned that our current directory is ~/D/objs.
+---
+> OK. So, from the above, we learned that our current directory is ~/D/objs.
+116c118,119
+< dunnent game has commands that take arguments, but the unix alias command
+---
+> homework is using aliases to make the unix prompt act like the dunnet game.
+> The actual game has commands that take arguments, but the unix alias command
+193c196
+< From the above we see the file created in the first homework. However, these
+---
+> From the above we see the files created in the first homework. However, these
+325c328
+< With get or drop implemented, we don't have the commands we need to change our
+---
+> Without get or drop implemented, we lack the commands we need to change our
+354c357
+< also use unix command to find a way to drop them:
+---
+> also use unix commands to find a way to drop them:
+412c415
+< display of "i" should only display "acid" or "board" or emerald, respectively.
+---
+> output of "i" will only display "acid" or "board" or "emerald", respectively.
+%
+
+From the above we see that these changes are all unimportant typos.
+
+There is one more difference, in the final 6 lines of the output:
+% diff ~/PA2walkthrough.txt PA2walkthroughRev.txt | tail -6
+621,622c624,625
+< In the original PA1, I had you name the room to the southeast as ".se". But
+< in this new version, it is just "se", and you can move into it just like any
+---
+> In the original PA1, I had you name the room to the southwest as ".sw". But
+> in this new version, it is just "sw", and you can move into it just like any
+%
+
+From the above, we see that the text now agrees with the directory structure
+of the game, in which the hidden area is southwest of the bear hangout.
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ - - - - - - Line-by-line Description of PA2's Aliases Script File - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+In the following discussion, sometimes the path will be displayed, like so:
+  % cd
+  % pwd
+  /home/Me
+  %
+
+In such cases, your path will be different, because you of course have a
+different user name than "Me".
+
+The rest of this file is a line-by-line description of the homework. As shown
+below, some parts are given to you already (such as Lines 1-10):
+
+
+Lines 1-2: ls ~/X &> /dev/null || ln -s /dev/null ~/X
+           ls ~/D &> /dev/null || ln -s ~/PA2assignment/dunnet ~/D
+
+           The above five lines create very short names linking to relevant
+           directories of the game.
+           
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 3: Leave this line blank (for more readable code)
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 4: alias l='___'
+        This line implements the game's "l" (look) command. The line does 
+        four things:
+        1.It changes to the directory to -. (If you don't know why it needs to
+          do this, re-read PA2walkthroughRev.txt. But, basically, many of the
+          aliases we use in this game will need to go into the current room of
+          the game. And if they do change the directory like this, then they
+          will need to make sure that the alias finishes in a state where the
+          current directory is, in the end, ~/D/objs.)
+        2.It removes the .v file. Why? Well, as the walkthrough explains, the
+          .v file is used to indicate that only a short room description will
+          be displayed (when you walk back int a room that has already been
+          visited). In this present case, however, the description is going to
+          display not because of entering the room, but because of running the
+          "l" command. With an "l", the long description always displays-- and
+          we will be achieving this effect by pretending the room is new, then
+          running the same display code that the move commands (defined below)
+          also call.
+        3.It runs the command, "disp". This command will be written by you on
+          Line 5, below. Why is it legal for us to use "disp" here on Line 4,
+          before it has been defined? It is legal because we are only defining
+          the "l" command right now, not running it. (It would be an error to
+          execute an "l" before we implemented "disp".)
+        4.It finishes with the current directory being ~/D/objs.
+
+-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 5: alias disp='(___)'
+        As we have just said, the "disp" command is called either from within
+        an "l" command, or from within one of the movement commands that will
+        be defined below. Importantly, the "disp" command is not meant to be
+        typed by the user. If you think again about line 4, you will recognize
+        that the current directory is the game's current room, whenever this
+        disp command runs. Therefore, this disp command (which is never typed
+        by the user at the command prompt) will NOT need to do the "cd -" that
+        most of the other commands in this script need to do.
+
+        The disp command has four jobs to do:
+        1. To display either the long or short description of this room, based
+           on whether the ".v" file exists.
+           Hint #1: If the .v file does not exist, then attempting to look at
+                    it would return an error value and print an error message.
+                    We don't want to see the error message, but the error
+                    value can be used in command coordination (see Lecture 3).
+           Hint #2: Although each directory's description file has a slightly
+                    different name, it is not hard to find a wildcard pattern
+                    that would match to any of these description files (since
+                    we would want to display whichever one happens to be in
+                    the current directory).
+        2. To create the ".v" file. This means that it is unimportant whether
+           the room had previously been visited (so the .v file had already
+           existed), because we just make the new .v file anyway. This also
+           means that it is only the disp alias that ever creates these .v
+           files. It is also worth pointing out that it is unimportant what
+           are the contents of the .v file that you create, because the disp
+           alias only uses a question of whether the file exists to determine
+           what kind of display to produce.
+        3. To call the "hereitems" alias that you will define on line 6 of
+           your script, and which will be described in the text below.
+        4. The fourth and final job of this "disp" alias is to return with a
+           "success" value. This raises several questions:
+           Q1. How does one "return with a "success" value?
+           A1. If the final command of the "disp" alias is a command that 
+               succeeds without producing an error, then the "disp" command
+               itself will, from an outsider's point of view, behave as having
+               succeeded. 
+               That is: typing: % "disp && echo Yes" should print the "Yes".
+           Q2. How can you be so sure that the "disp" command was successful?
+           A2. In the dunnet game, you are always in a room, so you can always
+               display that room's description.
+           Q3. Why do I want to return a "success" value?
+           A3. The movement aliases defined below will need this behavior.
+              (But the "l" alias defined on line 4 didn't need this behavior.)
+
+        In addition to the above four jobs, the disp command has another
+        requirement, which also arises from the way the movement aliases will
+        use it. This requirement is that the disp command must execute as one
+        unit. What this means is that earlier in this README file, on the 
+        218th line, it said "Line 5: alias disp='(___)'", and the parentheses
+        shown here are what force the alias to execute as a unit. 
+
+        To really understand this, consider a case where an alias was defined
+        without parentheses:
+           % alias noparen='echo A; echo B'
+           % noparen
+           A
+           B
+           % echo 1 && noparen
+           1
+           A
+           B
+           % echo 1 || noparen
+           1
+           B
+           % echo 1 || echo A; echo B
+           1
+           B
+           % echo 1 || (echo A; echo B)
+           1
+           % echo 1 || (noparen)
+           1
+           %
+
+        Now all of this above discussion is not to say that every alias needs
+        to be defined to run as a unit. That is because we know from lecture 3
+        that certain actions cannot be made permanent inside of a parentheses.
+        In fact, one of those actions is changing the directory, which is an
+        action that the movement aliases defined below will need to do.
+        To briefly illustrate what the issue is, consider:
+          % pwd
+          /home/Me/PA2assignment
+          % alias parencd='(cd /;echo I am temporarily at: `pwd`)'
+          % parencd
+          I am temporarily at: /
+          % pwd
+          /home/Me/PA2assignment
+          %
+
+-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 6: alias hereitems='ls __1__ &>~/X || ls __2__ &>~/X && \
+                         echo Here there is: `ls __1__ __2__ 2>~/X`'
+
+        This alias has 2 wildcard patterns for you to create. Before we talk
+        about those patterns, consider what the "hereitems" alias is meant to
+        do. Recall, from line 5, that the "disp" calls "hereitems" after it
+        displays the room description. Therefore, the job of "hereitems" is
+        to display the items that are in the room. But recall something that
+        was said in the walkthrough:
+--------------------------------------------
+% head -293 PA2walkthroughRev.txt | tail -19
+   >l
+   North end of N/S tunnel
+   You are at the north end of a north/south tunnel.  Stairs lead up and
+   down from here.  There is a garbage disposal here.
+   >d
+   Bottom of subway stairs
+   You are at the bottom of some stairs near the subway station.  There is
+   a room to the northeast.
+   Here there is: amethyst
+   >u
+   North end of N/S tunnel
+   >d
+   Bottom of subway stairs
+   Here there is: amethyst
+   >
+
+From the above, we see that some objects (such as the amethyst) display every
+time you enter the room. Other objects (such as the garbage disposal) don't
+display.
+--------------------------------------------
+        We learned from the text above that the hereitems alias will need to
+        only display certain filenames. Now you might think that distinction
+        is a question of which items you can pick up. After all, you can get
+        the amethyst (I mean in the real game, not in this homework), but you
+        can't get the garbage disposal. While this distinction is generally
+        true, it turns out that there are two things that you cannot get, but
+        which still display every time you enter their rooms: the bear and 
+        the boulder. In addition, there are certain objects with multiple
+        names: nitric=acid, cpu=chip=card=board, and emerald=bracelet. When
+        we run hereitems, we only want to see one name for each of these. 
+
+        OK, now that that has all been said, let us get to the implementation
+        of hereitems. As we've said earlier, you implement this by filling in
+        the __1__ and __2__ with two different wildcard patterns. Together,
+        these two patterns should display all the items that should display.
+        And these two patterns should not have any overlap in the filenames
+        that they display. And neither pattern should match any of the files
+        that shouldn't display (eg, the disposal).
+
+        Q1. Why two patterns? 
+        A1. Because I could not find a solution with one pattern. 
+
+        Q2. Is there an easy way to test my patterns?
+        A2. Yes. That is why I've provided the allroomdirsandfiles directory.
+        Consider the following:
+        % cd ~/PA2assignment/allroomdirsandfiles; ls
+        acid        coconuts      descriptionK  descriptionY  key       sw
+        amethyst    computer      descriptionL  descriptionZ  license   switch
+        bear        cpu           descriptionM  dinosaur      mail      tank
+        bin         d             descriptionN  disposal      n         tanks
+        bins        descriptionA  descriptionO  drop          ne        tree
+        blackboard  descriptionB  descriptionP  e             nitric    trees
+        board       descriptionC  descriptionQ  emerald       nw        u
+        bone        descriptionD  descriptionR  fish          palm      vax
+        boulder     descriptionE  descriptionS  food          ruby      w
+        bracelet    descriptionF  descriptionT  garbage       s
+        cabinet     descriptionG  descriptionU  gate          se
+        card        descriptionH  descriptionV  glycerine     shovel
+        chip        descriptionI  descriptionW  ibm           silver
+        coconut     descriptionJ  descriptionX  jar           skeleton
+        % echo Here there is: `ls __1__ __2__ 2>~/X` 
+        Here there is: acid amethyst bear bone boulder chip emerald food
+        glycerine jar key license ruby shovel silver
+        %
+
+       See how it works? If you have the correct __1__ and __2__, then you'll
+       see the above output. It did not print any of the files that should not
+       print but could be present in the current room (eg, disposal).
+       See also that "acid" displays, but not "nitric". And "emerald", but not
+       "bracelet". And "chip" displays, but not "cpu", "board", or "card". 
+       (If you match to different synonyms, that is OK -- but I think it will
+       be easier for you to try for my solution, because we know it can work.)
+           
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 7: Leave this line blank (for more readable code)
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 8: alias i='___'
+        This alias must go into the ~/D/inv directory. Then it must print, 
+        "You currently have: " and the list of all items in your inventory.
+        But there is a complication. The nitric acid, the emerald bracelet,
+        and the cpu chip card/board all have multiple names. So you can't
+        just use "ls *", because you don't want it to display multiple names.
+
+        Well, you might think, "Why not just reuse the __1__ and __2__ that we
+        used on line 6, since those pattern only matched to "acid", "emerald",
+        and "chip". The answer is that I could have let you do that, yes. But
+        it's better to use one pattern, not two.
+
+        So now you might think, "How can we do it in one pattern? We needed 
+        two patterns for Line 6." The answer to this is that the set of files
+        which may be present in the inventory is much smaller than those which
+        may be in the room. Rather than testing with the "allroomdirsandfiles"
+        directory, we should instead use the other directory I've provided to
+        you, "possibledunnetdircontents". Consider:
+         % cd ~/PA2assignment/possibledunnetdircontents/
+         % ls
+         acid      bone      chip     food       jar   license  objs   shovel
+         amethyst  bracelet  cpu      glycerine  key   nitric   rooms  silver
+         board     card      emerald  inv        lamp  obj      ruby
+         % ls <onewildcardpattern>
+         acid      board  bracelet  glycerine  key   license  shovel
+         amethyst  bone   food      jar        lamp  ruby     silver
+         %
+
+        In this case, it prints the "board" instead of the "chip", but that is
+        fine, since they are synonyms. If your pattern matches to different
+        synonyms, that is also OK.
+
+        Note also that the "possibledunnetdircontents" directory contains a
+        few things that would never be in the inventory (eg, "obj" or "inv").
+        Your pattern must not match to these, even though they'll never be in
+        your inventory. This rule is because the next programming assignment
+        will use your pattern a little differently than the current assignment
+        does, and it would be nice to have already made one pattern that can
+        serve both purposes (ie, the current purpose and a future purpose that
+        you don't know yet).
+        
+-   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+e
+Line 9: alias x='(cat >../obj; ______)2>~/X < '
+        Now this command can be confusing, because of the trick that we have
+        to use to run our alias with an argument. Our trick is fully explained
+        in the walkthrough, and I will here assume that you understood it...
+
+        By using the trick above, the ~/D/obj file will contain the argument.
+        In the case of the "x" command, this means that ~/D/obj contains the
+        name of the file that we want to "cat". What I mean is: the files for
+        these game objects contain of their descriptions. Consider:
+        % ls ~/PA2assignment/dunnet/inv/  (Here I assume you untarred PA1.tar)
+        lamp
+        % cat ~/PA2assignment/dunnet/inv/lamp
+        The lamp is hand-crafted by Geppetto.
+        % ls ~/PA2assignment/dunnet/rooms/n/n/
+        d  descriptionC  disposal  garbage  u
+        % cat ~/PA2assignment/dunnet/rooms/n/n/disposal
+        I see nothing special about that.
+        %
+
+        So the job of the "x" alias is to do either of the above two things:
+        to cat the file with that name in either the current room or in the
+        inventory. But the "x" command does have a third job also: to print
+        "I do not see that here" if neither of those two cats worked.
+
+        Hint: you are not trying to cat ~/D/obj, rather you are trying to cat
+        the file with the name that is in the ~/Dobj file's contents.
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 10: Leave this line blank (for more readable code)
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Now we've come to the movement aliases. Some of these are harder because they
+must handle locked doors. So let's first do a direction without such problems:
+
+Line 11: alias u='cd ->~/X; __1__; __2__; cleanup'
+         If we were in room C, then we would move up by running "cd u". But
+         it is not always so simple. What if we were in room D (The bottom of
+         the stairway, the place where the amethyst is)? From room D, we would
+         move up by typing "cd .." (because room D is down from room C).
+         But if neither "cd u" nor "cd .." gets us to the right place, then we
+         should print the message about not being able to go that way.
+
+         Look now at Line 11, above: alias u='cd ->~/X; __1__; __2__; cleanup'
+         What is __1__? What is __2__? What is cleanup?
+           __1__: This is a command that deals with the "cd u" case.
+           __2__: This is a command that deals with the "cd .." case.
+           cleanup: This is an alias that you'll define on Line 13. One of its
+                    jobs is to deal with the "You cannot go that way" case.
+
+         To say more precisely:
+         __1__: This executes a "cd u" and IF SUCCESSFUL it runs "disp" but
+                IF UNSUCCESUL, it creates a temporary file (the name doesn't
+                matter) in the current room. You may wonder why we need this
+                file. It has to do with the fact that we have three cases and
+                cannot easily construct a command coordination logic for all
+                the behaviors -- unless we use parentheses. But we can't use
+                parentheses, because the "u" command must be able to change
+                the directory (and remember Lecture 3, slides 23-30). So my
+                workaround solution is to communicate between the cases by
+                using this temporary file.
+                
+         __2__: This first attempts to remove the temporary file from the "d"
+                subdirectory of my parent directory. Then, IF SUCCESSFUL it
+                runs "cd .." and "disp".
+                  Q. What? Why the "d" subdirectory of my parent directory?"
+                  A. From any room in the game, we can type "cd ..", because
+                     all of these directories have parent directories. So the
+                     fact we are able to do a "cd .." means nothing. What we
+                     really need to know is whether we are currently in a "d"
+                     subdirectory of our parent's directory.
+                     Now what has the __1__ part accomplished? 
+                     - Maybe it has done a cd "u". In that case the "u" has
+                       already been processed; we want __2__ to do nothing.
+                     - Or maybe the __1__ has created a temporary file in the
+                       current directory. In that case, the successful removal
+                       of a temporary file from our parent's "d" subdirectory
+                       would tell me that my directory is, in fact, that "d"
+                       subdirectory. In other words, I should do a "cd ..".
+                       (but failure to remove the file would mean either that
+                       __1__ didn't make the file (because the "cd u" worked),
+                       or that my parent doesn't have a "d" subdirectory (in
+                       which case I know I'm not such a directory), or that my
+                       parent has a "d" subdirectory, but the temporary file
+                       isn't there, because I am in a different subdirectory).
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 12: alias d='cd ->~/X; __1__; __2__; cleanup'
+         This line is exactly like Line 11, but replace "cd u" with "cd d", 
+         and try removing the temporary file from the "u" subdirectory of your
+         parent's directory (rather than from the "d" subdirectory).
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 13: alias cleanup='__1__; __2__; cd ~/D/objs'
+         This alias handles a few final parts of the movement aliases. All of
+         the movement aliases end by running "cleanup".
+
+         __1__: This tries removing the temporary file from the current
+                directory. IF SUCCESSFUL it prints "You cannot go that way."
+                (And if the removal was unsuccessful, then that either means 
+                it never got made because the "cd u"/"cd d"/etc worked, or it
+                means the "cd .." worked and already removed it.)
+         __2__: This step deals with the problem of the symbolic link between
+                two of the rooms inside the museum. This is handled by making
+                the current path physical, not symbolic (see lines 498 to 535 
+                of PA2walkthroughRev.txt).
+                (Now you could ask why we always do this step, when most rooms
+                are not symbolically linked. The answer is that it is simpler
+                to just always make it a physical link, than it would be to
+                try to figure out when to do it and when not to do it.
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 14: Leave this line blank (for more readable code)
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 15: alias n='cd ->~/X; __1__; __2__; cleanup'
+         Now we are looking a direction that could have a locked door.
+         What this means is that the __1__ step gets more complicated:
+         __1__: This executes a "cd n" and IF SUCCESSFUL it runs "disp" but
+                IF UNSUCCESUL, tries displaying the contents of a file named
+                n, in the current directory (recall from homework 1, that the
+                error message about the locked door was stored in this file
+                named "n").
+                Next, only if the displaying of the "n" file was UNSUCCESSFUL
+                will it create the temporary file that __2__ and cleanup use.
+         __2__: The logic for this part is the same as for lines 13 & 14.
+
+Lines 16-21: Implement all of the other directions (except for "se") following
+             the same logic as described above in line 16. In other words, you
+             will follow the logic that allows for locked doors, even when
+             defining directions which cannot have such doors.
+
+Line 22: alias se='____'
+         In this case, trying to walk past the bear will get you killed.
+         Two things happen if you die: 1) the "se" file is displayed (since it
+         contains the message about how you died), and 2) the "exit" command
+         is run, which causes the "shell" to exit. Q. What shell? A. The bash
+         shell that you started as shown in the text below, if you remember:  
+            % head -7 PA2walkthroughRev.txt | tail -5 | cut -c1-58
+            % cd ~/PA2assignment
+            % bash
+            % source ./PA2.sh
+
+            Don't worry about what the above lines do, just type them.
+            %
+
+         See? When the exit happens, then the aliases defined by the source
+         command die along with the shell they were defined within.
+
+         As for the implementation of the "se" alias, it is not that different
+         than the other directions, aside from using the "exit" command. But
+         one thing to remember is that you cannot put the "exit" inside of
+         parentheses, because then it would only exit the parentheses.
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Line 23: Leave this line blank (for more readable code)
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+Lines 24-30: Type these as-is:
+         cd ~/PA2assignment
+         rm -rf dunnet
+         tar -xf PA1.tar
+         cd ~/D/rooms
+         disp
+         cd ~/D/objs
+         PS1=">"

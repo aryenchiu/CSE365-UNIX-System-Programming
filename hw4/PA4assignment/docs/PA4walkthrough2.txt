@@ -1,0 +1,437 @@
+% ./PA4.csh
+Museum station
+You are at the Museum subway stop.  A passage leads off to the north.
+>n
+N/S tunnel
+You are in a north/south tunnel.
+>n
+North end of N/S tunnel
+You are at the north end of a north/south tunnel.  Stairs lead up and
+down from here.  There is a garbage disposal here.
+>d
+Bottom of subway stairs
+You are at the bottom of some stairs near the subway station.  There is
+a room to the northeast.
+There is a valuable amethyst here.
+>ne
+Endgame computer room
+You are in another computer room.  There is a computer in here larger
+than you have ever seen.  It has no manufacturers name on it, but it
+does have a sign that says: This machine's name is ‘endgame’.  The
+exit is to the southwest.  There is no console here on which you could
+type.
+>sw
+Bottom of subway stairs
+There is a valuable amethyst here.
+>get all
+An amethyst: Taken.
+>u
+North end of N/S tunnel
+>get all
+Nothing to take.
+>l
+North end of N/S tunnel
+You are at the north end of a north/south tunnel.  Stairs lead up and
+down from here.  There is a garbage disposal here.
+>l disposal
+I see nothing special about that.
+>get disposal
+You cannot take that.
+>get amethyst
+I do not see that here.
+>get real
+I do not know what that is.
+>get
+You must supply an object.
+>u
+Top of subway stairs
+You are at the top of some stairs near the subway station.  There is
+a door to the west.
+>w
+Classroom
+You are in a classroom where school children were taught about natural
+history.  On the blackboard is written, ‘No children allowed downstairs.’
+There is a door to the east with an ‘exit’ sign on it.  There is another
+door to the west.
+There is a packet of glycerine here.
+>w
+Marine life area
+You are in the marine life area.  The room is filled with fish tanks,
+which are filled with dead fish that have apparently died due to
+starvation.  Doors lead out to the south and east.
+There is a valuable ruby here.
+There is a glass jar here.
+>drop amethyst
+Done.
+>s
+Geological display
+You are in the geological display.  All of the objects that used to
+be on display are missing.  There are rooms to the east, west, and
+north.
+>e
+Maintenance room
+You are in some sort of maintenance room for the museum.  There is a
+switch on the wall labeled ‘BL’.  There are doors to the west and north.
+There is a packet of nitric acid here.
+>n
+Classroom
+There is a packet of glycerine here.
+>s
+Maintenance room
+There is a packet of nitric acid here.
+>w
+Geological display
+>n
+Marine life area
+There is a valuable amethyst here.
+There is a valuable ruby here.
+There is a glass jar here.
+>e
+Classroom
+There is a packet of glycerine here.
+>e
+The door is locked.
+>w
+Marine life area
+There is a valuable amethyst here.
+There is a valuable ruby here.
+There is a glass jar here.
+>s
+Geological display
+>e
+Maintenance room
+There is a packet of nitric acid here.
+>get all
+Some nitric acid: Taken.
+>n
+Classroom
+There is a packet of glycerine here.
+>get all
+Some glycerine: Taken.
+>w
+Marine life area
+There is a valuable amethyst here.
+There is a valuable ruby here.
+There is a glass jar here.
+>i
+You currently have:
+A lamp
+Some glycerine
+Some nitric acid
+>get jar
+Taken.
+>i
+You currently have:
+A lamp
+Some glycerine
+Some nitric acid
+A glass jar
+>drop lamp
+Done.
+>drop acid
+Done.
+>drop glycerine
+Done.
+>i
+You currently have:
+A glass jar
+>drop jar
+Done.
+>i
+You currently have:
+>put acid in jar
+You don't have that.
+>get acid
+Taken.
+>i
+You currently have:
+Some nitric acid
+>put acid in jar
+Done.
+>i
+You currently have:
+>l
+Marine life area
+You are in the marine life area.  The room is filled with fish tanks,
+which are filled with dead fish that have apparently died due to
+starvation.  Doors lead out to the south and east.
+There is a valuable amethyst here.
+There is a packet of glycerine here.
+There is a lamp nearby.
+There is a valuable ruby here.
+There is a glass jar here.
+The jar contains:
+     There is a packet of nitric acid here.
+>get jar
+Taken.
+>i
+You currently have:
+A glass jar
+The jar contains:
+     Some nitric acid
+>get all
+An amethyst: Taken.
+Some glycerine: Taken.
+A lamp: Taken.
+A ruby: Taken.
+>i
+You currently have:
+An amethyst
+Some glycerine
+A lamp
+A ruby
+A glass jar
+The jar contains:
+     Some nitric acid
+>put glycerine in jar
+Done.
+>l
+Marine life area
+You are in the marine life area.  The room is filled with fish tanks,
+which are filled with dead fish that have apparently died due to
+starvation.  Doors lead out to the south and east.
+>i
+You currently have:
+An amethyst
+A lamp
+A ruby
+A glass jar
+The jar contains:
+     Some nitric acid
+     Some glycerine
+>s
+Geological display
+>w
+Museum lobby
+You are in the main lobby for the Museum of Natural History.  In the center
+of the room is the huge skeleton of a dinosaur.  Doors lead out to the
+south and east.
+There is a dinosaur bone here.
+>get all
+A bone: Taken.
+>s
+Museum entrance
+You are in front of the Museum of Natural History.  A door leads into
+the building to the north, and a road leads to the southeast.
+>se
+Main-Maple intersection
+You are at the intersection of Main Street and Maple Ave.  Main street
+runs north and south, and Maple Ave runs east off into the distance.
+If you look north and east you can see many intersections, but all of
+the buildings that used to stand here are gone.  Nothing remains except
+street signs.
+There is a road to the northwest leading to a gate that guards a building.
+>nw
+The gate will not open.
+>x gate
+It is a large metal gate that is too big to climb over.
+>get gate
+You cannot take that.
+>get all
+Nothing to take.
+>s
+Post office
+You are near the remains of a post office.  There is a mail drop on the
+face of the building, but you cannot see where it leads.  A path leads
+back to the east, and a road leads to the north.
+>e
+Meadow
+You are in a meadow in the back of an old building.  A small path leads
+to the west, and a door leads to the south.
+There is a bus driver's license here.
+There is a silver bar here.
+>get bar
+I do not know what that is.
+>get silver
+Taken.
+>get all
+A license: Taken.
+>l
+Meadow
+You are in a meadow in the back of an old building.  A small path leads
+to the west, and a door leads to the south.
+>s
+Old Building hallway
+You are in the hallway of an old building.  There are rooms to the east
+and west, and doors leading out to the north and south.
+>n
+You don't have a key that can open this door.
+>e
+Mailroom
+You are in a mailroom.  There are many bins where the mail is usually
+kept.  The exit is to the west.
+>w
+Old Building hallway
+>w
+Computer room
+You are in a computer room.  It seems like most of the equipment has
+been removed.  There is a VAX 11/780 in front of you, however, with
+one of the cabinets wide open.  A sign on the front of the machine
+says: This VAX is named ‘pokey’.  To type on the console, use the
+‘type’ command.  The exit is to the east.
+The panel lights are steady and motionless.
+>e
+Old Building hallway
+>s
+Building front
+You are at the end of the road.  There is a building in front of you
+to the northeast, and the road leads back to the southwest.
+>nw
+You cannot go that way.
+>ne
+You don't have a key that can open this door.
+>sw
+NE/SW road
+You are on a northeast/southwest road.
+>sw
+Fork
+You are at a fork of two passages, one to the northeast, and one to the
+southeast.  The ground here seems very soft. You can also go back west.
+>dig
+You have nothing with which to dig.
+>w
+E/W Dirt road
+You are on the continuation of a dirt road.  There are more trees on
+both sides of you.  The road continues to the east and west.
+There is a large boulder here.
+>get all
+Nothing to take.
+>get boulder
+You cannot take that.
+>x boulder
+It is just a boulder.  It cannot be moved.
+>w
+Dead end
+You are at a dead end of a dirt road.  The road goes to the east.
+In the distance you can see that it will eventually fork off.  The
+trees here are very tall royal palms, and they are spaced equidistant
+from each other.
+There is a shovel here.
+>x boulder
+I don't see that here.
+>get all
+A shovel: Taken.
+>dig
+Digging here reveals nothing.
+>e
+E/W Dirt road
+There is a large boulder here.
+>dig
+Digging here reveals nothing.
+>e
+Fork
+>dig
+I think you found something.
+>l
+Fork
+You are at a fork of two passages, one to the northeast, and one to the
+southeast.  The ground here seems very soft. You can also go back west.
+There is a CPU card here.
+>get all
+A computer board: Taken.
+>dig
+Digging here reveals nothing.
+>se
+SE/NW road
+You are on a southeast/northwest road.
+There is a food here.
+>get food
+Taken.
+>se
+Bear hangout
+You are standing at the end of a road.  A passage leads back to the
+northwest.
+There is a ferocious bear here.
+>sw
+Hidden area
+You are in a well-hidden area off to the side of a road.  Back to the
+northeast through the brush you can see the bear hangout.
+There is an emerald bracelet here.
+>get all
+A bracelet: Taken.
+>i
+You currently have:
+An amethyst
+A computer board
+A bone
+A bracelet
+Some food
+A lamp
+A license
+A ruby
+A shovel
+A silver bar
+A glass jar
+The jar contains:
+     Some nitric acid
+     Some glycerine
+>ne
+Bear hangout
+There is a ferocious bear here.
+>drop food
+Done.
+The bear takes the food and runs away with it. He left something behind.
+>l
+Bear hangout
+You are standing at the end of a road.  A passage leads back to the
+northwest.
+There is a shiny brass key here.
+>get all
+A brass key: Taken.
+>se
+You cannot go that way.
+>nw
+SE/NW road
+>nw
+Fork
+>ne
+NE/SW road
+>ne
+Building front
+>drop key
+Done.
+>ne
+You don't have a key that can open this door.
+>get key
+Taken.
+>ne
+Old Building hallway
+>n
+You don't have a key that can open this door.
+>w
+Computer room
+>i
+You currently have:
+An amethyst
+A computer board
+A bone
+A bracelet
+A brass key
+A lamp
+A license
+A ruby
+A shovel
+A silver bar
+A glass jar
+The jar contains:
+     Some nitric acid
+     Some glycerine
+>drop jar
+Done.
+As the jar impacts the ground it explodes into many pieces.
+>i
+You currently have:
+An amethyst
+A computer board
+A bone
+A bracelet
+A brass key
+A lamp
+A license
+A ruby
+A shovel
+A silver bar
+>quit
+
+You have scored 0 out of a possible 90 points.
+>

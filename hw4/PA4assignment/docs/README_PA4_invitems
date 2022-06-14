@@ -1,0 +1,172 @@
+You've already seen README file that describes how to implement the hereitems
+alias. This current README file describes how to design a new alias that has
+some similarities to the hereitems alias.
+
+The new alias is named "invitems", and it deals with how items display when in
+the inventory. To review how items display, let's look at all the "i" commands
+in the PA4walkthrough2.txt file that I have provided in the same posting as this present README file:
+
+  % cat PA4walkthrough2.txt | tr "\n>" "@\n" | grep -n ^i | tr "@\n" "\n>" | sed 's/>\([0-9]*:\)/\1\n>/'
+  35:i
+  You currently have:
+  A lamp
+  Some glycerine
+  Some nitric acid
+  37:
+  >i
+  You currently have:
+  A lamp
+  Some glycerine
+  Some nitric acid
+  A glass jar
+  41:
+  >i
+  You currently have:
+  A glass jar
+  43:
+  >i
+  You currently have:
+  46:
+  >i
+  You currently have:
+  Some nitric acid
+  48:
+  >i
+  You currently have:
+  51:
+  >i
+  You currently have:
+  A glass jar
+  The jar contains:
+       Some nitric acid
+  53:
+  >i
+  You currently have:
+  An amethyst
+  Some glycerine
+  A lamp
+  A ruby
+  A glass jar
+  The jar contains:
+       Some nitric acid
+  56:
+  >i
+  You currently have:
+  An amethyst
+  A lamp
+  A ruby
+  A glass jar
+  The jar contains:
+       Some nitric acid
+       Some glycerine
+  104:
+  >i
+  You currently have:
+  An amethyst
+  A computer board
+  A bone
+  A bracelet
+  Some food
+  A lamp
+  A license
+  A ruby
+  A shovel
+  A silver bar
+  A glass jar
+  The jar contains:
+       Some nitric acid
+       Some glycerine
+  120:
+  >i
+  You currently have:
+  An amethyst
+  A computer board
+  A bone
+  A bracelet
+  A brass key
+  A lamp
+  A license
+  A ruby
+  A shovel
+  A silver bar
+  A glass jar
+  The jar contains:
+       Some nitric acid
+       Some glycerine
+  122:
+  >i
+  You currently have:
+  An amethyst
+  A computer board
+  A bone
+  A bracelet
+  A brass key
+  A lamp
+  A license
+  A ruby
+  A shovel
+  A silver bar
+  >%
+
+
+To summarze the above, here is how each item prints:
+"A silver bar", "A glass jar", "A computer board", "A brass key",
+"Some nitric acid", "Some glycerine", "Some food", "An amethyst",
+"A lamp", "A license", "A bone", "A ruby", "A bracelet", "A shovel".
+
+And when inside the jar, the items are indented 5 spaces, just like with
+hereitems.
+
+Now, as we consider how to implement invitems, let's notice the differences
+versus hereitems:
+  1) They display differently. For example the cpu/chip/card/board displays as
+     "There is a CPU card here." but lists in inventory as "A computer board".
+     And "There is a shiny brass key here." compares to "A brass key".
+  2) They run in different directories. When hereitems is invoked, we imagine
+     that the current directory is the room. But when invitems is invoked, we
+     imagine that the current directory is ~/D/inv. (Note: neither of these
+     aliases requires that you be in any specific directory; those directories
+     are just the use-cases that we expect.)
+  3) Since the directories these aliases run in are different, the wildcard
+     patterns used to list the contents will also be different. For example,
+     the invitems alias need not worry about objects like the blackboard.
+  4) Since the directories these aliases run in are different, the invitems
+     alias cannot use the trick that hereitems had used, where hereitems knew
+     that there was always description file in the current directory. Since
+     we do not have such an always-present file in the case of invitems, we'll
+     need to create our own file, in order to fix the problem with showing a
+     jar when nothing else is in the inventory. (A post to the cyberuniversity
+     labeled "A note on hereitems" discussed this problem.)
+
+Now before going into the details of invitems, there are two rules:
+  1) You cannot use anything except sed "s" commands to complete this alias.
+  2) For full points, the character length of this alias must be as short as
+     possible. (There was no such rule for hereitems.)
+
+And now for the details. Fill in the blanks (____) below:
+
+alias invitems 'touch X && ls --color=never [^cen]* | sed "__1__;...__X__" |\
+grep .|tr \\n @|sed "__X+1;...__Y__";rm X
+
+
+In the above we first use touch to create a temporary file named X, which we
+will need to have so that we can fix the problem with the jar when it is the
+only thing in the inventory.
+
+Next, we use ls to display the objects which can be in the inventory, without
+showing the aliases. I also used "--color=never" because I was getting ugly
+color in my output.
+
+Next, the "s" commands of __1__ to __X__ are used to do everything except for
+indentation. So these "s" commands add all of the adjectives (eg, "nitric 
+acid" or "silver bar"), and these "s" commands add the "A" or "An" or "Some"
+articles, as needed. It also create the "The jar contains:" output.
+
+Next, the "grep ." removes empty lines, and the "tr \\n @" gets everything on
+one line so that indentation can be done (just like you needed to do for
+hereitems).
+
+Next, the __X+1__ to __Y__ are used to add the indentation.
+
+Finally, the "rm X" gets rid of the temporary file that we had created to
+fix the problem with the jar.

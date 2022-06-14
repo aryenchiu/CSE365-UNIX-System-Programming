@@ -1,0 +1,730 @@
+In this new homework, we will improve the game behavior, compared to the
+previous homework. This improved behavior is possible because this time we
+will use a c-shell script, rather than playing the game from the UNIX prompt.
+
+This new homework will produce the exact behavior of dunnet for these commands
+(plus their synonyms): drop, get, x, i, dig, and put.
+   
+To see what the exact behavior of these commands is, let's play through some
+of the game.
+
+We'll start our discussion of exact behavior by considering the "get" command.
+
+Let's try giving different arguments to "get":
+   % emacs -batch -l dunnet
+   
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a shovel here.
+   >get tree                   <=Q: What does it do for an ungetable object?
+   You cannot take that.         A: It says: "You cannot take that."
+   >get food                   <=Q: What about for objects that aren't here?
+   I do not see that here.       A: It says, "I do not see that here."
+   >get lamp                   <=Q: What about for objects in your inventory?
+   I do not see that here.       A: It still says, "I do not see that here."
+   >get boulder                <=Q: What about if both ungetable and not here?
+   I do not see that here.       A: It still says, "I do not see that here."
+   >get gg                     <=Q: What about undefined object names?
+   I don't know what that is.    A: It says, "I don't know what that is."
+   >get                        <=Q: What does get do when not given an object?
+   You must supply an object.    A: It says: "You must supply an object."
+   >drop lamp
+   Done.
+   >
+
+So far, this is behaving just like for the previous homework, except that we
+got proper error messages when we tried getting an undefined object, or when
+we tried not supplying an object.
+
+Next, we will see that the "get" command actually has a synonym:
+   >get lamp  
+   Taken.                      <= We used "get", but it said "taken". Hmmm.
+   >take shovel                <= Q: I wonder if "take" is a synonym of "get"?
+   Taken.                         A: Yes, it is.
+   >drop shovel
+   Done.
+   >drop lamp
+   Done.
+   >l
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a shovel here.
+   There is a lamp nearby.
+   >
+
+We now have two items on the ground. What if we get both at the same time?
+   >get lamp shovel
+   Taken.
+   >i
+   You currently have:
+   A lamp
+   >
+
+It only got the first object. So I wonder, does "get" ignore everything after
+the first argument?
+   >get shovel gg gg gg
+   Taken.
+   >get
+   You must supply an object.
+   >
+
+Yes, it ignored the undefined object gg, with no error message. So this means
+that our implementation should math the original game and only check the first
+argument. (And, as we see above, it will complain if there are no arguments.) 
+
+Moving on, let's try to use the "all" argument:
+   >drop shovel
+   Done.
+   >drop lamp
+   Done.
+   >take all gg gg gg   <= Here also, all arguments but the first are ignored.
+   A shovel: Taken.
+   A lamp: Taken.
+   >get all
+   Nothing to take.
+   >
+   
+In the above, the shovel displayed before the lamp. In your implementation,
+however, the order that the objects display is not important -- for any of the
+following commands: "get all" or "i" or "l".
+
+Moving on, let's see the messages "drop" creates if given different arguments:
+   >drop shovel lamp
+   Done.
+   >i
+   You currently have:
+   A lamp
+   >drop gg
+   I don't know what that is.
+   >drop
+   You must supply an object.
+   >throw lamp                <=As we see here, "throw" is a synonym of "drop"
+   Done.
+   >throw lamp
+   You don't have that.
+   >get all
+   A shovel: Taken.
+   A lamp: Taken.
+   >drop lamp shovel
+   Done.
+   >i
+   You currently have:
+   A shovel
+   >drop all                 
+   I don't know what that is. <=As we see here, there is no "drop all"
+   >drop shovel gg gg gg gg
+   Done.
+   >i
+   You currently have:
+   >l
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a lamp nearby.
+   There is a shovel here.
+   >
+
+Looking at the above, "drop" ignores extra arguments, just like "get" does. We
+also see that "throw" is a synonym of "drop", and that the game has no "drop
+all" behavior.
+
+Moving on:
+   >e
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a large boulder here.
+   >w
+   Dead end
+   >get all
+   A lamp: Taken.
+   A shovel: Taken.
+   >e
+   E/W Dirt road
+   There is a large boulder here.
+   >
+
+Now that we have learned about get/take and drop/throw, let's move on to "x":
+   >x bear
+   I don't see that here.
+   >x gg
+   I don't know what that is.
+   >x boulder
+   It is just a boulder.  It cannot be moved.
+   >i
+   You currently have:
+   A lamp
+   A shovel
+   >x shovel lamp
+   It is a normal shovel with a price tag attached that says $19.99.
+   >x shovel gg gg gg gg gg
+   It is a normal shovel with a price tag attached that says $19.99.
+   >x all
+   I don't know what that is.
+   >
+
+As we see above, "x" ignores extra arguments, just like "get" and "drop".
+
+But what if "x" gets no arguments? In that case, its behavior is surprising:
+   >x
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a large boulder here.
+   >
+
+The "x" command with no arguments behaved like an "l" command. I wonder: "Are
+they synonyms?" That is: "Will the "l" command accept an argument like "x"?"
+   >l
+   E/W Dirt road
+   You are on the continuation of a dirt road.  There are more trees on
+   both sides of you.  The road continues to the east and west.
+   There is a large boulder here.
+   >l boulder
+   It is just a boulder.  It cannot be moved.
+   >x boulder
+   It is just a boulder.  It cannot be moved.
+   >
+
+Yes, they are synonyms. In fact, "look" and "examine" are also synonyms:
+   >look boulder
+   It is just a boulder.  It cannot be moved.
+   >examine boulder
+   It is just a boulder.  It cannot be moved.
+   >
+
+OK. The next command to try is "dig"
+   >dig
+   Digging here reveals nothing.
+   >dig gg
+   Digging here reveals nothing.
+   >dig with shovel
+   Digging here reveals nothing.
+   >
+
+From the above, we see that the dig command ignores any arguments.
+
+Next, we'll see how the shovel affects "dig":
+   >drop shovel
+   Done.
+   >dig
+   You have nothing with which to dig.
+   >dig gg
+   You have nothing with which to dig.
+   >get shovel gg gg gg
+   Taken.
+   >
+
+From the above, we see that you get an error message if you don't have the
+shovel.
+
+Moving on, is there anywhere that something might be dug up? What about that
+"soft ground":
+   >e
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   >dig
+   I think you found something.
+   >l
+   Fork
+   You are at a fork of two passages, one to the northeast, and one to the
+   southeast.  The ground here seems very soft. You can also go back west.
+   There is a CPU card here.
+   >get card
+   Taken.  
+   >dig
+   Digging here reveals nothing.
+   >
+
+This "soft ground" is the only place where the shovel will find something.
+
+Moving on, let's go see the bear:
+   >se
+   SE/NW road
+   You are on a southeast/northwest road.
+   There is some food here.
+   >se
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   There is a ferocious bear here!
+   >
+
+Let's see what happens when we feed the bear:
+   >nw
+   SE/NW road
+   There is some food here.
+   >get food
+   Taken.
+   >drop food
+   Done.
+   >get food
+   Taken.
+   >
+
+From the above, we see that the food must be dropped where the bear is, to
+have an effect. So let's try that:
+   >se
+   Bear hangout
+   There is a ferocious bear here!
+   >throw food
+   Done.
+   The bear takes the food and runs away with it. He left something behind.
+   >l
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   There is a shiny brass key here.
+   >
+
+So, when you feed the bear, it leaves with the food, and the key appears. This
+behavior needs to be included in the "drop"/"throw" command. (There is also a
+"feed" command in the game, but we won't implement it.)
+
+Also, note that moving south-east no longer kills you, since the bear is gone:
+   >se
+   You can't go that way.
+   >
+
+The next thing to test is to try using the key we just found:
+   >get key
+   Taken.  
+   >nw
+   SE/NW road
+   >nw
+   Fork
+   There is a CPU card here.
+   >ne
+   NE/SW road
+   You are on a northeast/southwest road.
+   >ne
+   Building front
+   You are at the end of the road.  There is a building in front of you
+   to the northeast, and the road leads back to the southwest.
+   >drop key
+   Done.
+   >ne
+   You don't have a key that can open this door.
+   >
+
+From the above, we see that you cannot get in the building without the key.
+This is true even after you have opened the door in the past:
+   >get key
+   Taken.
+   >ne
+   Old Building hallway
+   You are in the hallway of an old building.  There are rooms to the east
+   and west, and doors leading out to the north and south.
+   >sw
+   Building front
+   >drop key
+   Done.
+   >ne
+   You don't have a key that can open this door.
+   >
+
+Looking again at the Old Building hallway, it has another door to the north.
+Let's try using our key on that door:
+   >get key
+   Taken.
+   >ne
+   Old Building hallway
+   >n
+   You don't have a key that can open this door.
+   >
+
+It turns out that we will not get the key for this door. (We already know what
+is on the other side, because we start the savedgame file in a subway station
+that is on the other side of this door -- but once we pass through this door,
+we won't be able to go back through it to the north again.)
+
+The next thing to try doing is to look at the vax computer:
+   >w
+   Computer room
+   You are in a computer room.  It seems like most of the equipment has
+   been removed.  There is a VAX 11/780 in front of you, however, with
+   one of the cabinets wide open.  A sign on the front of the machine
+   says: This VAX is named ‘pokey’.  To type on the console, use the
+   ‘type’ command.  The exit is to the east.
+   The panel lights are steady and motionless.
+   >x vax
+   I see nothing special about that.
+   >
+
+The above message says that we can use the "type" command, so let's try it:
+   >type
+   You type on the keyboard, but your characters do not even echo.
+   >e
+   Old Building hallway
+   >type
+   There is nothing here on which you could type.
+   >w
+   Computer room
+   The panel lights are steady and motionless.
+   >type
+   You type on the keyboard, but your characters do not even echo.
+   >
+
+Now, we will NOT implement "type" in this game. But when we tried using the
+"type" command, why did nothing happen? Answer: because the vax computer is
+missing its cpu card (and that is why its panel lights aren't blinking).
+
+To fix the vax, we have to "put" the cpu into it. But first, let's try putting
+the cpu in other places:
+   >put
+   You must supply an object
+   >put cpu
+   You must supply an indirect object.
+   >put cpu lamp
+   You must supply an indirect object.
+   >put cpu in lamp
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >put cpu in cpu
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >put cpu in boulder
+   That indirect object is not here.
+   >put cpu in gg
+   I don't know what that indirect object is.
+   >put cpu gg boulder gg gg gg
+   That indirect object is not here.
+   >
+
+From the above, we see that the put command cares about the first and third
+arguments, but ignores everything else. The various error messages shown above
+display accordingly.
+
+Next, let's try putting other things into the vax:
+   >put boulder in vax
+   You don't have that.
+   >put gg in vax
+   I don't know what that object is.
+   >put key in vax
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >put vax in vax
+   You don't have that.
+   >
+
+The last two commands above teach something: the first argument (the "object")
+must be in your inventory, but the third argument (the "indirect object") only
+has to be present. Like the vax, it can be in the room. But it can also be in
+the inventory:
+   >put key in shovel
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >put shovel in key
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >drop shovel
+   Done.
+   >put key in shovel
+   I don't know how to combine those objects.  Perhaps you should
+   just try dropping it.
+   >put shovel in key
+   You don't have that.
+   >
+
+Moving on:
+   >get shovel
+   Taken.
+   >e
+   Old Building hallway
+   >i
+   You currently have:
+   A lamp
+   A computer board
+   A brass key
+   A shovel
+   >
+   
+OK. Let's do the correct action now, and see what the effect is:
+   >w
+   Computer room
+   The panel lights are steady and motionless.
+   >put cpu in vax
+   As you put the CPU board in the computer, it immediately springs to life.
+   The lights start flashing, and the fans seem to startup.
+   >e
+   Old Building hallway
+   >w
+   Computer room
+   The panel lights are flashing in a seemingly organized pattern.
+   >i
+   You currently have:
+   A lamp
+   A brass key
+   A shovel
+   >get cpu
+   I do not see that here.
+   >x vax
+   I see nothing special about that.
+   >
+
+From the above, we see that the panel is changed and the cpu card is gone.
+At this point in the game, you would execute "type", but we won't do that.
+
+
+Now we are near the end of the walkthrough. One of the remaining topic to
+discuss is how objects display when: 1) in the room, 2) when picked up, or
+3) when in your inventory.
+
+To help condense the walkthrough demonstration of how all of these display,
+I have executed the following:
+   % emacs -batch -l dunnet
+
+   Dead end
+   You are at a dead end of a dirt road.  The road goes to the east.
+   In the distance you can see that it will eventually fork off.  The
+   trees here are very tall royal palms, and they are spaced equidistant
+   from each other.
+   There is a shovel here.
+   >restore savedgame
+   Done.
+   Museum station
+   You are at the Museum subway stop.  A passage leads off to the north.
+   >
+   ...
+   First:A sequence of moves that resulted in getting every object in our part
+     of the game, except the key (because I have to lose the food to get key).
+   ...
+   Second:A sequence of moves to drop all of those items where the boulder is,
+     except for the shovel. (Why did I keep the shovel? Answer: Because the
+     shovel is heavy, so I had my reasons to not put it with the other items.
+     Better answer: Don't ask why I kept the shovel, because our version of
+     the game doesn't consider how heavy objects are.)
+   >
+
+Well, now that the above long sequence of commands has been typed, let's see
+how the game displays the various items. First of all, I'll put the shovel
+where the bear is:
+   >e
+   Fork
+   >se
+   SE/NW road
+   >se   
+   Bear hangout
+   There is a ferocious bear here!
+   >i
+   A shovel   
+   >drop shovel
+   Done.
+   >nw
+   SE/NW road
+   >nw
+   Fork
+   >
+
+So now we are finally ready to see the displays:
+   >w
+   E/W Dirt road
+   There is a large boulder here.
+   There is a packet of nitric acid here.
+   There is a packet of glycerine here.
+   There is a glass jar here.
+   There is a silver bar here.
+   There is a lamp nearby.
+   There is some food here.
+   There is a valuable amethyst here.
+   There is a CPU card here.
+   There is a bus driver's license here.
+   There is a dinosaur bone here.
+   There is a valuable ruby here.
+   There is an emerald bracelet here.
+   >get all
+   Some nitric acid: Taken.
+   Some glycerine: Taken.
+   A glass jar: Taken.
+   A silver bar: Taken.
+   A lamp: Taken.
+   Some food: Taken.
+   An amethyst: Taken.
+   A computer board: Taken.
+   A license: Taken.
+   A bone: Taken.
+   A ruby: Taken.
+   A bracelet: Taken.
+   >i
+   You currently have:
+   Some nitric acid
+   Some glycerine
+   A glass jar
+   A silver bar
+   A lamp
+   Some food
+   An amethyst: Taken.
+   A computer board
+   A license: Taken.
+   A bone: Taken.
+   A ruby: Taken.
+   A bracelet
+   >
+
+The above shows all of the displays of all of the items, except for the shovel
+(which is in a different place), the bear (which is in a different place), and
+the key (which is in a different place). Let's redrop all those items, except
+for a few that we will need:
+   >drop silver
+   Done.
+   >drop lamp
+   Done.
+   >drop amethyst
+   Done.
+   >drop cpu
+   Done.
+   >drop license
+   Done.
+   >drop bone
+   Done.
+   >drop ruby
+   Done.
+   >drop bracelet
+   Done.
+   >
+
+Now let's go see the bear and see how the items at that spot display:
+   >e
+   Fork
+   >se
+   SE/NW road
+   >se
+   Bear hangout
+   There is a ferocious bear here!
+   >drop food
+   Done.
+   The bear takes the food and runs away with it. He left something behind.
+   >nw
+   SE/NW road
+   >se
+   Bear hangout
+   There is a shovel here.
+   There is a shiny brass key here.
+   >get all
+   A shovel: Taken.
+   A brass key: Taken.
+   >i
+   You currently have:
+   Some nitric acid
+   Some glycerine
+   A glass jar
+   A shovel
+   A brass key
+   >
+
+Well, now we know how all of the objects display.
+
+There is only one topic left, making the nitro-glycerine by putting those two
+items into the jar:
+   >put key in jar
+   That will not fit in the jar.
+   >put glycerine in jar
+   Done.
+   >put acid in jar
+   Done.
+   >i
+   You currently have:
+   A glass jar
+   The jar contains:
+        Some glycerine
+        Some nitric acid
+   A shovel
+   A brass key
+   >
+
+From the above we see that we have made the nitro-glycerine. The glycerine and
+acid are the only two items that will fit into the jar.
+
+We can also take them out again:
+   >get acid
+   You remove it from the jar.
+   >i
+   You currently have:
+   A glass jar
+   The jar contains:
+        Some glycerine
+   A shovel
+   A brass key
+   Some nitric acid
+   >
+
+Let's put the jar on the ground, to see that you can still put items in it:
+   >drop jar
+   Done.
+   >nw
+   SE/NW road
+   >se
+   Bear hangout
+   There is a glass jar here.
+   The jar contains:
+        There is a packet of glycerine here.
+   >put acid in jar
+   Done.
+   >nw
+   SE/NW road
+   >se
+   Bear hangout
+   There is a glass jar here.
+   The jar contains:
+        There is a packet of glycerine here.
+        There is a packet of nitric acid here.
+   >
+
+The above also shows how the jar displays its contents when displaying upon
+entering the place where it is laying on the ground. Also, notice that only
+the glycerine was in the jar when I dropped it, above (the acid was added
+after it was on the ground).
+
+Let's try getting the acid:
+   >get acid
+   I do not see that here.
+   >get jar
+   Taken.
+   >get acid
+   You remove it from the jar.
+   >
+
+So, we see that we can only get things out of the jar while we're holding it.
+
+Time to finish the walkthrough:
+   >i
+   You currently have:
+   A shovel
+   A brass key
+   A glass jar
+   The jar contains:
+        Some glycerine
+   Some nitric acid
+   >put acid in jar
+   >i
+   You currently have:
+   A shovel
+   A brass key
+   A glass jar
+   The jar contains:
+        Some glycerine
+        Some nitric acid
+   >drop jar
+   Done.
+   As the jar impacts the ground it explodes into many pieces.
+   >i
+   You currently have:
+   A shovel
+   A brass key
+   >l
+   Bear hangout
+   You are standing at the end of a road.  A passage leads back to the
+   northwest.
+   >
+
+The jar is gone, because it blows up if you drop/throw it while it contains
+both items.

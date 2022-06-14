@@ -1,0 +1,513 @@
+In this file, we will walkthrough the part of the game that we will be
+implementing in the upcoming homeworks. By reading this file, you will
+understand why we want to create the directory structure we need to
+make in this homework. At the end of this file, the full structure is
+summarized.
+
+The walkthrough:
+
+To run the game, execute emacs like this:
+-- % cd PA1assignment
+-- % ls savedgame
+-- savedgame
+-- % emacs -batch -l dunnet
+-- 
+-- Dead end
+-- You are at a dead end of a dirt road.  The road goes to the east.
+-- In the distance you can see that it will eventually fork off.  The
+-- trees here are very tall royal palms, and they are spaced equidistant
+-- from each other.
+-- There is a shovel here.
+-- >
+
+Now that the game is running, we'll load up the part that we'll be using
+for this homework:
+-- >restore savedgame
+-- Done.
+-- Museum station
+-- You are at the Museum subway stop.  A passage leads off to the north.
+-- >
+
+We are now in the first room of the part of the game that we will be working
+with. We'll call this room A. The game says that you can only go north. But
+let's try going south first:
+-- >s
+-- You can't go that way.
+-- >n
+-- N/S tunnel
+-- You are in a north/south tunnel.
+-- >
+
+Yes, it is true that you could only go north. We are now in room B. But
+what does it mean, in homework 1, to say that heading north from room A
+takes you to room B? It means that you will create a subdirectory for
+room B inside of room A. Now let's keep going:
+-- >n
+-- North end of N/S tunnel
+-- You are at the north end of a north/south tunnel.  Stairs lead up and
+-- down from here.  There is a garbage disposal here.
+-- >x disposal
+-- I see nothing special about that.
+-- >x garbage
+-- I see nothing special about that.
+-- >x stairs
+-- I don't know what that is.
+-- >
+
+We'll call this new room, as room C. We see that there is a garbage disposal
+here. This object can be examined by either the name disposal or the name
+garbage. What this means, for homework 1, is that the directory for room C
+will contain two files, named "garbage" and "disposal". Both of these files
+will contain the same data, the sentence "I see nothing special about that."
+(In homework 2, we will use the contents of these files to allow us to
+implement an "x" command to display these object description sentences.) We
+also see that the game has limits, because there are stairs here, but the
+game doesn't understand the word "stairs". This means that we don't make a
+file for this object.
+
+Well, let's move on. Let's look again at the description of this room:
+-- >look
+-- North end of N/S tunnel
+-- You are at the north end of a north/south tunnel.  Stairs lead up and
+-- down from here.  There is a garbage disposal here.
+-- >
+
+We see that, from here we can go either up or down. What this means is that
+room C will contain two subdirectories (one named "d" and one named "u"), in
+addition to the "garbage" and "disposal" files. Let's go down first:
+-- >d
+-- Bottom of subway stairs
+-- You are at the bottom of some stairs near the subway station.  There is
+-- a room to the northeast.
+-- There is a valuable amethyst here.
+-- >x amethyst
+-- I see nothing special about that.
+-- >ne
+-- Endgame computer room
+-- You are in another computer room.  There is a computer in here larger
+-- than you have ever seen.  It has no manufacturers name on it, but it
+-- does have a sign that says: This machine's name is ‘endgame’.  The
+-- exit is to the southwest.  There is no console here on which you could
+-- type.
+-- >x computer
+-- I see nothing special about that.
+-- >
+
+Now we have visited rooms D & E. They both have objects in them. As for the
+"computer" object, we will find that it has other allowed names:
+-- >x pc
+-- I see nothing special about that.
+-- >x cabinet
+-- I see nothing special about that.
+-- >x vax
+-- I see nothing special about that.
+-- >
+
+(A "vax" was an old brand of mainframe computer). Let's continue on.
+The only exit from the computer room is to go back southwest. So:
+-- >sw
+-- Bottom of subway stairs
+-- There is a valuable amethyst here.
+-- >
+
+From the above, we notice that the description is shorter for rooms we have
+already visited. This will become relevant for the second homework. We also
+can consider what it means (in our homework 1 directory structure) to go
+back from room E to room D; it means to do a "cd ..". In other words, to get
+to retrace our steps from room A to B to C to D to E and back to D, we would
+go: "cd PA1/rooms; cd n; cd n; cd d; cd ne; cd ..".
+
+Let's walk around some more:
+-- >ne
+-- Endgame computer room
+-- >sw
+-- Bottom of subway stairs
+-- There is a valuable amethyst here.
+-- >u
+-- North end of N/S tunnel
+-- >u
+-- Top of subway stairs
+-- You are at the top of some stairs near the subway station.  There is
+-- a door to the west.
+-- >
+
+From the above, we see that some objects redisplay every time you enter the
+room (such as the amethyst), but other objects only get mentioned the first
+time you enter (such as the garbage disposal). We also see that we have gone
+into a new room, room F. This room has an exit to the west we can follow:
+-- >w
+-- Classroom
+-- You are in a classroom where school children were taught about natural
+-- history.  On the blackboard is written, ‘No children allowed downstairs.’
+-- There is a door to the east with an ‘exit’ sign on it.  There is another
+-- door to the west.
+-- There is a packet of glycerine here.
+-- >e
+-- The door is locked.
+-- >
+
+In the above, we see that we have encountered the locked door. We entered
+from the unlocked side, but we cannot go back where we came. The way that
+we will handle this is to create a file named "e" in this directory, with
+the contents of this file being the sentence: "The door is locked." As an
+extra rule, this file must be UNIX format, meaning it can't have a \r.
+
+As we will see in homework 2, creating this "e" file will allow us to make
+a game that can't go back through this door (ie, homework 2 will need to
+prevent us from doing a "cd .." here, based on the fact that the "e" file
+exists).
+
+(Now, as compared to trying to do a "cd .." to go back through a door that
+has locked behind us, there is also the idea of trying to go forward into
+a subdirectory that has a locked door leading to it. In previous semesters,
+we modeled this kind of locked door by denying you permissions to enter the
+room, which is a very good analogy for a locked door. This year, however,
+because of the part of the game that we are implementing, the only locked
+doors are the kind that lock behind us.)
+
+We are now in room G and we cannot go back. But we can go south or west:
+-- >s
+-- Maintenance room
+-- You are in some sort of maintenance room for the museum.  There is a
+-- switch on the wall labeled ‘BL’.  There are doors to the west and north.
+-- There is a packet of nitric acid here.
+-- >w
+-- Geological display
+-- You are in the geological display.  All of the objects that used to
+-- be on display are missing.  There are rooms to the east, west, and
+-- north.
+-- >n
+-- Marine life area
+-- You are in the marine life area.  The room is filled with fish tanks,
+-- which are filled with dead fish that have apparently died due to
+-- starvation.  Doors lead out to the south and east.
+-- There is a glass jar here.
+-- There is a valuable ruby here.
+-- >
+
+We have now seen rooms G-J. But there is something new about these rooms,
+because they form a loop, as we see here:
+-- >e
+-- Classroom
+-- There is a packet of glycerine here.
+-- >s
+-- Maintenance room
+-- There is a packet of nitric acid here.
+-- >w
+-- Geological display
+-- >n
+-- Marine life area
+-- There is a glass jar here.
+-- There is a valuable ruby here.
+-- >s
+-- Geological display
+-- >
+
+The above loop introduces a complication to our directory system, because, so
+far, each room was located inside of the directory of another room. But that
+is a tree structure, so it cannot make a cycle. There is a solution, however:
+we will use a link to create the cycle (as described below).
+
+Continuing on:
+-- >w
+-- Museum lobby
+-- You are in the main lobby for the Museum of Natural History.  In the center
+-- of the room is the huge skeleton of a dinosaur.  Doors lead out to the
+-- south and east.
+-- There is a dinosaur bone here.
+-- >x bone
+-- I see nothing special about that.
+-- >x dinosaur
+-- Unfortunately you do not know enough about dinosaurs to tell very much about
+-- it.  It is very big, though.
+-- >x skeleton
+-- Unfortunately you do not know enough about dinosaurs to tell very much about
+-- it.  It is very big, though.
+-- >s
+-- Museum entrance
+-- You are in front of the Museum of Natural History.  A door leads into
+-- the building to the north, and a road leads to the southeast.
+-- >se
+-- Main-Maple intersection
+-- You are at the intersection of Main Street and Maple Ave.  Main street
+-- runs north and south, and Maple Ave runs east off into the distance.
+-- If you look north and east you can see many intersections, but all of
+-- the buildings that used to stand here are gone.  Nothing remains except
+-- street signs.
+-- There is a road to the northwest leading to a gate that guards a building.
+-- >
+
+In our game, we will not go to the streets to the east and west. So there are
+only two directions we need to implement: northwest and south. Let's try it:
+-- >nw
+-- The gate will not open.
+-- >x gate
+-- It is a large metal gate that is too big to climb over.
+-- >
+
+So we see that the gate is closed, and we can't go back northwest. This means
+we need a file named nw, containing the sentence: "The gate will not open."
+If south is the only ay that we can go, then let's go south:
+-- >s
+-- Post office
+-- You are near the remains of a post office.  There is a mail drop on the
+-- face of the building, but you cannot see where it leads.  A path leads
+-- back to the east, and a road leads to the north.
+-- >x mail
+-- It says ‘express mail’ on it.
+-- >x drop
+-- It says ‘express mail’ on it.
+-- >e
+-- Meadow
+-- You are in a meadow in the back of an old building.  A small path leads
+-- to the west, and a door leads to the south.
+-- There is a bus driver's license here.
+-- There is a silver bar here.
+-- >x bar
+-- I don't know what that is.
+-- >x silver
+-- I see nothing special about that.
+-- >
+
+So we've seen a few more spots, and the objects in those places. We see
+that the silver bar is only identified as "silver", not as "bar". Anyway,
+continuing on:
+-- >s
+-- Old Building hallway
+-- You are in the hallway of an old building.  There are rooms to the east
+-- and west, and doors leading out to the north and south.
+-- >n
+-- You don't have a key that can open this door.
+-- >
+
+So we have found another door that locks behind us. Therefore we need a
+file name "n" which contains the sentence: "You don't have a key that can
+open this door." Now looking around the house:
+-- >e
+-- Mailroom
+-- You are in a mailroom.  There are many bins where the mail is usually
+-- kept.  The exit is to the west.
+-- >x bin
+-- All of the bins are empty.  Looking closely you can see that there
+-- are names written at the bottom of each bin, but most of them are
+-- faded away so that you cannot read them.  You can only make out three
+-- names:
+--                    Jeffrey Collier
+--                    Robert Toukmond
+--                    Thomas Stock
+-- 
+-- >x bins
+-- All of the bins are empty.  Looking closely you can see that there
+-- are names written at the bottom of each bin, but most of them are
+-- faded away so that you cannot read them.  You can only make out three
+-- names:
+--                    Jeffrey Collier
+--                    Robert Toukmond
+--                    Thomas Stock
+--
+-- >
+
+The bin (or bins) have a longer description than other objects, but that
+isn't a real difference. Anyway, let's look around some more:
+-- >w
+-- Old Building hallway
+-- >w
+-- Computer room
+-- You are in a computer room.  It seems like most of the equipment has
+-- been removed.  There is a VAX 11/780 in front of you, however, with
+-- one of the cabinets wide open.  A sign on the front of the machine
+-- says: This VAX is named ‘pokey’.  To type on the console, use the
+-- ‘type’ command.  The exit is to the east.
+-- The panel lights are steady and motionless.
+-- >x vax
+-- I see nothing special about that.
+-- >x computer
+-- I see nothing special about that.
+-- >
+
+So there is another computer room, and it also has the computer/vax/pc/
+cabinet object. Let's continue:
+-- >e
+-- Old Building hallway
+-- >s
+-- Building front
+-- You are at the end of the road.  There is a building in front of you
+-- to the northeast, and the road leads back to the southwest.
+-- >n
+-- You can't go that way.
+-- >ne
+-- You don't have a key that can open this door.
+-- >
+
+Well, we have another door locking behind us. But this time it is strange.
+We went south to exit the house, but the door is located to the northeast
+(instead of to the north). The solution to this is that we will need two
+files: one named "n" that holds "You can't go that way.", and one named
+"ne" that holds "You don't have a key that can open this door."
+
+We're getting near the end. Let's keep going:
+-- >sw
+-- NE/SW road
+-- You are on a northeast/southwest road.
+-- >sw
+-- Fork
+-- You are at a fork of two passages, one to the northeast, and one to the
+-- southeast.  The ground here seems very soft. You can also go back west.
+-- >w
+-- E/W Dirt road
+-- You are on the continuation of a dirt road.  There are more trees on
+-- both sides of you.  The road continues to the east and west.
+-- There is a large boulder here.
+-- >x boulder
+-- It is just a boulder.  It cannot be moved.
+-- >x tree
+-- They are palm trees with a bountiful supply of coconuts in them.
+-- >x trees
+-- They are palm trees with a bountiful supply of coconuts in them.
+-- >x coconut
+-- I see nothing special about that.
+-- >
+
+We see that there are many objects here with boulder. Let's continue on:
+-- >w
+-- Dead end
+-- You are at a dead end of a dirt road.  The road goes to the east.
+-- In the distance you can see that it will eventually fork off.  The
+-- trees here are very tall royal palms, and they are spaced equidistant
+-- from each other.
+-- There is a shovel here.
+-- >x coconut
+-- I see nothing special about that.
+-- >x tree
+-- They are palm trees with a bountiful supply of coconuts in them.
+-- >
+
+The same trees are in this place. There is also a shovel. But its a
+dead end, so let's go back:
+-- >e
+-- E/W Dirt road
+-- There is a large boulder here.
+-- >e
+-- Fork
+-- >look
+-- Fork
+-- You are at a fork of two passages, one to the northeast, and one to the
+-- southeast.  The ground here seems very soft. You can also go back west.
+-- >
+
+Here we notice the hint that the ground is soft. We remember that there was
+a shovel back at the dead end. Yes, there is something buried here: a cpu.
+Since in it buried, however, we should make it a hidden object ".cpu".
+Note: we won't be getting the shovel or digging it up in homework #1.
+Note also: the cpu object can also be called a "board", "chip" or "card".
+But this doesn't affect homework #1, because just making a hidden cpu is
+enough for our purpose.
+
+Continuing on:
+-- >se
+-- SE/NW road
+-- You are on a southeast/northwest road.
+-- There is some food here.
+-- >se
+-- Bear hangout
+-- You are standing at the end of a road.  A passage leads back to the
+-- northwest.
+-- There is a ferocious bear here!
+-- >
+
+This bear is hiding a key. So the "key" file needs to be a hidden file
+in this directory.
+
+Although it says that we are at the end of the road, there is a secret
+place to the southwest of here. since it is hidden the name of its
+directory should be ".sw". Let's go see it:
+-- >sw
+-- Hidden area
+-- You are in a well-hidden area off to the side of a road.  Back to the
+-- northeast through the brush you can see the bear hangout.
+-- There is an emerald bracelet here.
+-- >
+
+This is the final directory in the game! It is room Z (because there are
+26 rooms). It has a bracelet. There is one more thing to try, however:
+-- >ne
+-- Bear hangout
+-- There is a ferocious bear here!
+-- >x bear
+-- It looks like a grizzly to me.
+-- >nw
+-- SE/NW road
+-- There is some food here.
+-- >se
+-- Bear hangout
+-- There is a ferocious bear here!
+-- >se
+-- The bear is very annoyed that you would be so presumptuous as to try
+-- and walk right by it.  He tells you so by tearing your head off.
+-- 
+-- You are dead.
+-- You have scored 0 out of a possible 90 points.
+-- %
+
+Trying to walk past the bear was a fatal mistake. What it means for
+homework 1 is that the five lines of text about the bear killing you
+need to go into a file named "se".
+
+ -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+So that is the walkthrough. There are 26 rooms in the part of the game
+that you will be designing the rooms for. I've mapped these 26 rooms
+to the 26 letters of the alphabet, as shown here:
+   a Museum station
+   b N/S tunnel
+   c North end of N/S tunnel
+   d Bottom of subway stairs
+   e Endgame computer room
+   f Top of subway stairs
+   g Classroom
+   h Maintenance room
+   i Geological display
+   j Marine life area
+   k Museum lobby
+   l Museum entrance
+   m Main-Maple intersection
+   n Post office
+   o Meadow
+   p Old Building hallway
+   q Mailroom
+   r Computer room
+   s Building front
+   t NE/SW road
+   u Fork
+   v E/W Dirt road
+   w Dead end
+   x SE/NW road
+   y Bear hangout
+   z Hidden area
+
+
+They are connected as shown here (this should be viewed with a fixed-width font):
+
+            j––g←–f               Legend:
+            :  |   ▙              ▙           
+         k––i––h   █▙             █▙ Stairs (up/down)
+         |           c            
+         l           |▙   e       \|/- Ordinary connections
+          ↘          b█▙ /        
+           m         |  d         ←↓↘  One-way connections  
+           |         a
+           n––o                   : Link between rooms i & j
+              ↓
+           r––p––q
+              ↓
+              s
+             /
+            t
+           /
+    w––v––u
+           \
+            x
+             \
+              y
+             / 
+            z   
